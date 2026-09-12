@@ -2,3 +2,4 @@ server.js
 .env
 .env.example
 *.log
+
