@@ -2,22 +2,12 @@
   "name": "ai-emotion-diary",
   "version": "1.0.0",
   "description": "AI 감정일기 - Vercel 서버리스 함수와 Google Gemini API를 활용한 감정 분석 웹 서비스",
-  "main": "api/analyze.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "vercel dev"
+    "start": "node server.js"
   },
   "engines": {
     "node": ">=18.0.0"
   },
-  "keywords": [
-    "vercel",
-    "serverless",
-    "gemini",
-    "ai",
-    "emotion-diary"
-  ],
   "author": "albatjin",
   "license": "MIT"
 }
-
