@@ -2,6 +2,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const analyzeHandler = require('./api/analyze');
+const historyHandler = require('./api/history');
 
 const PORT = process.env.PORT || 3000;
 const MIME_TYPES = {
@@ -34,12 +35,25 @@ const server = http.createServer(async (req, res) => {
       try {
         await analyzeHandler(req, res);
       } catch (err) {
-        console.error('Serverless execution error:', err);
+        console.error('Analyze execution error:', err);
         if (!res.headersSent) {
           res.status(500).json({ error: err.message });
         }
       }
     });
+    return;
+  }
+
+  // API 엔드포인트: /api/history -> Vercel 서버리스 함수(api/history.js) 위임
+  if (req.url.startsWith('/api/history')) {
+    try {
+      await historyHandler(req, res);
+    } catch (err) {
+      console.error('History execution error:', err);
+      if (!res.headersSent) {
+        res.status(500).json({ error: err.message });
+      }
+    }
     return;
   }
 
@@ -76,6 +90,6 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`\n✨ AI 감정일기 로컬 서버 실행 중: http://localhost:${PORT}`);
-  console.log(`⚡ 서버리스 함수 경로: /api/analyze (api/analyze.js)`);
-  console.log(`🔒 GEMINI_API_KEY는 서버 사이드에서만 안전하게 사용됩니다.\n`);
+  console.log(`⚡ 서버리스 함수: /api/analyze, /api/history`);
+  console.log(`🔒 GEMINI_API_KEY와 REDIS_URL은 안전하게 보호됩니다.\n`);
 });

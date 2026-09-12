@@ -21,18 +21,19 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: center;
-      padding: 24px 16px;
+      align-items: flex-start;
+      padding: 32px 16px;
     }
 
     .container {
       background-color: #ffffff;
       width: 100%;
-      max-width: 640px;
-      border-radius: 20px;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+      max-width: 680px;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.06), 0 8px 12px -6px rgba(0, 0, 0, 0.03);
       padding: 36px 32px;
       border: 1px solid rgba(226, 232, 240, 0.8);
+      margin: 0 auto;
     }
 
     .header {
@@ -52,7 +53,7 @@
       letter-spacing: -0.2px;
     }
 
-    /* 1. 제목: 오늘의 하루는 어땠나요? */
+    /* 1. 제목 */
     h1.title {
       font-size: 26px;
       font-weight: 700;
@@ -60,7 +61,7 @@
       letter-spacing: -0.5px;
     }
 
-    /* 2. 여러 줄 텍스트 입력창 (textarea) */
+    /* 2. textarea 입력창 */
     .input-group {
       margin-bottom: 16px;
     }
@@ -74,7 +75,7 @@
       color: #2d3748;
       background-color: #f8fafc;
       border: 1.5px solid #e2e8f0;
-      border-radius: 14px;
+      border-radius: 16px;
       resize: vertical;
       outline: none;
       transition: all 0.2s ease;
@@ -91,11 +92,11 @@
       color: #94a3b8;
     }
 
-    /* 3. 버튼 영역: 음성으로 입력하기, 분석 요청하기 */
+    /* 3. 버튼 영역 */
     .button-group {
       display: flex;
       gap: 12px;
-      margin-bottom: 32px;
+      margin-bottom: 28px;
     }
 
     .btn {
@@ -107,7 +108,7 @@
       padding: 14px 18px;
       font-size: 15px;
       font-weight: 600;
-      border-radius: 12px;
+      border-radius: 14px;
       border: none;
       cursor: pointer;
       transition: all 0.2s ease;
@@ -135,23 +136,24 @@
     .btn-analyze {
       background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
       color: #ffffff;
-      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
     }
 
     .btn-analyze:hover {
       background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
       transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+      box-shadow: 0 6px 18px rgba(79, 70, 229, 0.35);
     }
 
     .btn-analyze:active, .btn-voice:active {
       transform: translateY(0);
     }
 
-    /* 4. AI의 답변 영역 */
+    /* 4. AI 답변 영역 */
     .response-section {
       border-top: 1px solid #f1f5f9;
       padding-top: 24px;
+      margin-bottom: 32px;
     }
 
     .response-title {
@@ -166,12 +168,12 @@
 
     .response-box {
       background-color: #f1f5f9;
-      border-radius: 14px;
+      border-radius: 16px;
       padding: 20px;
-      min-height: 110px;
+      min-height: 90px;
       color: #64748b;
       font-size: 15px;
-      line-height: 1.6;
+      line-height: 1.65;
       border: 1px solid #e2e8f0;
       white-space: pre-wrap;
       word-break: break-word;
@@ -180,8 +182,163 @@
 
     .response-box.has-content {
       color: #1e293b;
-      background-color: #f8fafc;
+      background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%);
+      border-color: #ddd6fe;
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.06);
+    }
+
+    /* 5. 나의 일기 히스토리 섹션 */
+    .history-section {
+      border-top: 1.5px dashed #e2e8f0;
+      padding-top: 28px;
+    }
+
+    .history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .history-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .history-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #e0e7ff;
+      color: #4338ca;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      margin-left: 4px;
+    }
+
+    .btn-refresh {
+      background: transparent;
+      border: 1px solid #e2e8f0;
+      color: #64748b;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-refresh:hover {
+      background-color: #f1f5f9;
+      color: #1e293b;
       border-color: #cbd5e1;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* 일기 카드 */
+    .history-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 20px 22px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
+      transition: all 0.25s ease;
+    }
+
+    .history-card:hover {
+      border-color: #cbd5e1;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.06), 0 4px 6px -4px rgba(0, 0, 0, 0.03);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .card-date {
+      font-size: 13px;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .emotion-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      background-color: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .emotion-tag.happy { background-color: #fef3c7; color: #b45309; }
+    .emotion-tag.calm { background-color: #dcfce7; color: #15803d; }
+    .emotion-tag.sad { background-color: #e0f2fe; color: #0369a1; }
+    .emotion-tag.anxious { background-color: #ffedd5; color: #c2410c; }
+    .emotion-tag.angry { background-color: #fee2e2; color: #b91c1c; }
+
+    .card-diary-content {
+      font-size: 15px;
+      color: #334155;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+      margin-bottom: 14px;
+    }
+
+    .card-ai-bubble {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: #1e293b;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .card-ai-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #4f46e5;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .empty-history, .loading-state, .error-history {
+      text-align: center;
+      padding: 36px 16px;
+      color: #94a3b8;
+      font-size: 14px;
+      background-color: #f8fafc;
+      border-radius: 16px;
+      border: 1px dashed #cbd5e1;
     }
 
     @keyframes pulse {
@@ -191,13 +348,18 @@
 
     @media (max-width: 480px) {
       .container {
-        padding: 24px 18px;
+        padding: 24px 16px;
       }
       .button-group {
         flex-direction: column;
       }
       h1.title {
         font-size: 22px;
+      }
+      .card-top {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
       }
     }
   </style>
@@ -256,6 +418,29 @@
       </h2>
       <div id="aiResponse" class="response-box">여기에 AI답변이 표시됩니다.</div>
     </div>
+
+    <!-- 5. 나의 일기 히스토리 섹션 -->
+    <div class="history-section">
+      <div class="history-header">
+        <h2 class="history-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z"></path>
+            <path d="M6 6h10"></path>
+            <path d="M6 10h10"></path>
+          </svg>
+          나의 일기 히스토리
+          <span id="historyCount" class="history-badge">0</span>
+        </h2>
+        <button id="btnRefreshHistory" class="btn-refresh" title="히스토리 새로고침" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19"></path>
+          </svg>
+        </button>
+      </div>
+      <div id="historyList" class="history-list">
+        <div class="loading-state">Serverless Redis에서 히스토리를 불러오는 중입니다... 💭</div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -263,6 +448,9 @@
     const btnVoice = document.getElementById('btnVoice');
     const btnAnalyze = document.getElementById('btnAnalyze');
     const aiResponse = document.getElementById('aiResponse');
+    const historyList = document.getElementById('historyList');
+    const historyCount = document.getElementById('historyCount');
+    const btnRefreshHistory = document.getElementById('btnRefreshHistory');
 
     // 음성 인식 (Web Speech API) 기능 연결
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -273,23 +461,20 @@
     if (SpeechRecognition) {
       recognition = new SpeechRecognition();
       recognition.lang = 'ko-KR';
-      recognition.continuous = false; // 발화가 끝나면 자동으로 인식 종료
-      recognition.interimResults = true; // 실시간 텍스트 변환 반영
+      recognition.continuous = false;
+      recognition.interimResults = true;
 
-      // 음성 인식이 시작되면 버튼의 텍스트를 '음성 인식 중'으로 변경
       recognition.onstart = () => {
         isRecording = true;
         btnVoice.classList.add('recording');
         btnVoice.querySelector('span').textContent = '음성 인식 중';
 
-        // 기존에 작성된 텍스트가 있을 경우 자연스럽게 이어지도록 공백 처리
         initialText = diaryInput.value;
         if (initialText && !initialText.endsWith(' ') && !initialText.endsWith('\n')) {
           initialText += ' ';
         }
       };
 
-      // 사용자가 말을 하면 음성을 텍스트로 변환하여 입력창에 자동 반영
       recognition.onresult = (event) => {
         let transcript = '';
         for (let i = 0; i < event.results.length; i++) {
@@ -303,7 +488,7 @@
         console.error('Speech recognition error:', event.error);
         stopRecording();
         if (event.error === 'network') {
-          alert('음성 인식 네트워크 오류가 발생했습니다.\n\n[해결 방법]\n1. 파일을 직접 더블클릭하여 file:// 로 연 경우 보안 정책상 차단될 수 있습니다.\n   터미널에서 `node server.js` 실행 후 http://localhost:3000 으로 접속해 보세요.\n2. PC의 인터넷 연결 상태를 확인해 주세요.');
+          alert('음성 인식 네트워크 오류가 발생했습니다.\n인터넷 연결 상태를 확인해 주세요.');
         } else if (event.error === 'not-allowed') {
           alert('마이크 사용 권한이 차단되어 있습니다. 브라우저 주소창 좌측 아이콘을 클릭하여 마이크 권한을 허용해 주세요.');
         } else if (event.error !== 'no-speech' && event.error !== 'aborted') {
@@ -311,7 +496,6 @@
         }
       };
 
-      // 인식이 끝나면 '음성으로 입력하기'로 복원
       recognition.onend = () => {
         stopRecording();
       };
@@ -340,7 +524,7 @@
       }
     });
 
-    // 분석 요청하기: Google Gemini API 백엔드 연동
+    // 분석 요청하기: Google Gemini API 백엔드 호출 및 Redis 저장 연동
     btnAnalyze.addEventListener('click', async () => {
       const text = diaryInput.value.trim();
       if (!text) {
@@ -372,13 +556,17 @@
         aiResponse.classList.add('has-content');
         aiResponse.textContent = data.reply;
 
-        // 1. 일기 내용과 AI 답변을 로컬 스토리지에 저장
+        // 로컬 스토리지에 최신 데이터 임시 캐시
         try {
           localStorage.setItem('emotionDiary_text', text);
           localStorage.setItem('emotionDiary_aiReply', data.reply);
         } catch (storageErr) {
           console.warn('로컬 스토리지 저장 실패:', storageErr);
         }
+
+        // 새 일기 저장이 완료되었으므로 히스토리 목록 자동 갱신!
+        loadDiaryHistory();
+
       } catch (error) {
         console.error('Analysis error:', error);
         aiResponse.classList.add('has-content');
@@ -389,8 +577,151 @@
       }
     });
 
-    // 2. 페이지 처음 로드 시 로컬 스토리지 데이터 확인 및 복원
-    function restoreSavedData() {
+    // 날짜 포맷 변환 헬퍼 (예: diary-20260912163603 또는 ISO 문자열)
+    function formatDate(rawId, createdAt) {
+      if (createdAt) {
+        try {
+          const d = new Date(createdAt);
+          if (!isNaN(d.getTime())) {
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const hh = String(d.getHours()).padStart(2, '0');
+            const min = String(d.getMinutes()).padStart(2, '0');
+            return `${yyyy}. ${mm}. ${dd} ${hh}:${min}`;
+          }
+        } catch {}
+      }
+
+      // id가 diary-YYYYMMDDHHmmss 형태인 경우 파싱
+      if (rawId && rawId.startsWith('diary-')) {
+        const numPart = rawId.replace('diary-', '');
+        if (numPart.length >= 12) {
+          const y = numPart.substring(0, 4);
+          const m = numPart.substring(4, 6);
+          const d = numPart.substring(6, 8);
+          const h = numPart.substring(8, 10);
+          const min = numPart.substring(10, 12);
+          return `${y}. ${m}. ${d} ${h}:${min}`;
+        }
+      }
+
+      return '최근 일기';
+    }
+
+    // AI 답변에서 감정 추출 및 뱃지 스타일 결정
+    function extractEmotion(reply) {
+      if (!reply) return { text: '감정 분석', className: '' };
+      const match = reply.match(/감정\s*:\s*([^\n\r]+)/);
+      if (match && match[1]) {
+        const em = match[1].trim();
+        let cls = '';
+        if (em.includes('기쁨') || em.includes('행복') || em.includes('신남')) cls = 'happy';
+        else if (em.includes('평온') || em.includes('편안') || em.includes('안정')) cls = 'calm';
+        else if (em.includes('슬픔') || em.includes('우울') || em.includes('외로움')) cls = 'sad';
+        else if (em.includes('불안') || em.includes('걱정') || em.includes('긴장')) cls = 'anxious';
+        else if (em.includes('분노') || em.includes('화') || em.includes('답답')) cls = 'angry';
+        return { text: em, className: cls };
+      }
+      return { text: '감정 분석', className: '' };
+    }
+
+    // Serverless Redis로부터 일기 히스토리 불러오기
+    async function loadDiaryHistory() {
+      try {
+        const res = await fetch('/api/history', {
+          cache: 'no-store'
+        });
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || '히스토리를 불러오지 못했습니다.');
+        }
+
+        const list = data.diaries || [];
+        historyCount.textContent = list.length;
+
+        if (list.length === 0) {
+          historyList.innerHTML = `
+            <div class="empty-history">
+              🌱 아직 저장된 일기 히스토리가 없습니다.<br>
+              첫 번째 일기를 작성하고 AI의 따뜻한 분석을 받아보세요!
+            </div>
+          `;
+          return;
+        }
+
+        // 각 항목을 최신순 카드 형태로 렌더링
+        historyList.innerHTML = list.map(item => {
+          const dateStr = formatDate(item.id, item.createdAt);
+          const emotionInfo = extractEmotion(item.aiReply);
+          const diaryText = (item.diaryText || '').trim();
+          const aiReply = (item.aiReply || '').trim();
+
+          return `
+            <div class="history-card">
+              <div class="card-top">
+                <div class="card-date">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  ${dateStr}
+                </div>
+                <span class="emotion-tag ${emotionInfo.className}">
+                  ✨ ${emotionInfo.text}
+                </span>
+              </div>
+              <div class="card-diary-content">${escapeHtml(diaryText)}</div>
+              ${aiReply ? `
+                <div class="card-ai-bubble">
+                  <div class="card-ai-label">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    AI 상담가의 답장
+                  </div>
+                  <div>${escapeHtml(aiReply)}</div>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('History load error:', err);
+        historyList.innerHTML = `
+          <div class="error-history">
+            ⚠️ 히스토리를 불러오는 중 오류가 발생했습니다.<br>
+            <small style="color:#ef4444;">${escapeHtml(err.message)}</small>
+          </div>
+        `;
+      }
+    }
+
+    // HTML 태그 XSS 이스케이프 함수
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    // 새로고침 버튼 이벤트
+    btnRefreshHistory.addEventListener('click', () => {
+      btnRefreshHistory.style.transform = 'rotate(180deg)';
+      loadDiaryHistory().finally(() => {
+        setTimeout(() => {
+          btnRefreshHistory.style.transform = 'rotate(0deg)';
+        }, 300);
+      });
+    });
+
+    // 페이지 로드 시 로컬스토리지 복원 및 히스토리 자동 조회 실행
+    function init() {
       try {
         const savedText = localStorage.getItem('emotionDiary_text');
         const savedAiReply = localStorage.getItem('emotionDiary_aiReply');
@@ -398,7 +729,6 @@
         if (savedText) {
           diaryInput.value = savedText;
         }
-
         if (savedAiReply) {
           aiResponse.classList.add('has-content');
           aiResponse.textContent = savedAiReply;
@@ -406,11 +736,12 @@
       } catch (e) {
         console.warn('로컬 스토리지 복원 실패:', e);
       }
+
+      // 페이지 로드 시 히스토리 자동 로드
+      loadDiaryHistory();
     }
 
-    // 페이지 로드 시 즉시 복원 실행
-    restoreSavedData();
+    init();
   </script>
 </body>
 </html>
-
