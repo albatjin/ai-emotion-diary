@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 감정일기</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      background: linear-gradient(135deg, #f5f7fb 0%, #eef2f7 100%);
+      color: #2d3748;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px 16px;
+    }
+
+    .container {
+      background-color: #ffffff;
+      width: 100%;
+      max-width: 640px;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+      padding: 36px 32px;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .header {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background-color: #eef2ff;
+      color: #4f46e5;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 9999px;
+      margin-bottom: 12px;
+      letter-spacing: -0.2px;
+    }
+
+    /* 1. 제목: 오늘의 하루는 어땠나요? */
+    h1.title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1a202c;
+      letter-spacing: -0.5px;
+    }
+
+    /* 2. 여러 줄 텍스트 입력창 (textarea) */
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .diary-textarea {
+      width: 100%;
+      min-height: 180px;
+      padding: 16px;
+      font-size: 15px;
+      line-height: 1.6;
+      color: #2d3748;
+      background-color: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      resize: vertical;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .diary-textarea:focus {
+      background-color: #ffffff;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+    }
+
+    .diary-textarea::placeholder {
+      color: #94a3b8;
+    }
+
+    /* 3. 버튼 영역: 음성으로 입력하기, 분석 요청하기 */
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 32px;
+    }
+
+    .btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-voice {
+      background-color: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+    }
+
+    .btn-voice:hover {
+      background-color: #e2e8f0;
+      color: #1e293b;
+    }
+
+    .btn-voice.recording {
+      background-color: #fee2e2;
+      color: #dc2626;
+      border-color: #fca5a5;
+      animation: pulse 1.5s infinite;
+    }
+
+    .btn-analyze {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+
+    .btn-analyze:hover {
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+    }
+
+    .btn-analyze:active, .btn-voice:active {
+      transform: translateY(0);
+    }
+
+    /* 4. AI의 답변 영역 */
+    .response-section {
+      border-top: 1px solid #f1f5f9;
+      padding-top: 24px;
+    }
+
+    .response-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .response-box {
+      background-color: #f1f5f9;
+      border-radius: 14px;
+      padding: 20px;
+      min-height: 110px;
+      color: #64748b;
+      font-size: 15px;
+      line-height: 1.6;
+      border: 1px solid #e2e8f0;
+      white-space: pre-wrap;
+      word-break: break-word;
+      transition: all 0.3s ease;
+    }
+
+    .response-box.has-content {
+      color: #1e293b;
+      background-color: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 24px 18px;
+      }
+      .button-group {
+        flex-direction: column;
+      }
+      h1.title {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="header">
+      <span class="badge">✨ AI 감정일기</span>
+      <!-- 1. 제목 -->
+      <h1 class="title">오늘의 하루는 어땠나요?</h1>
+    </div>
+
+    <!-- 2. textarea 입력창 -->
+    <div class="input-group">
+      <textarea 
+        id="diaryInput" 
+        class="diary-textarea" 
+        placeholder="오늘 있었던 일이나 느꼈던 감정을 자유롭게 적어보세요..."
+      ></textarea>
+    </div>
+
+    <!-- 3. 버튼 그룹 -->
+    <div class="button-group">
+      <button id="btnVoice" class="btn btn-voice" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+          <line x1="12" y1="19" x2="12" y2="22"></line>
+        </svg>
+        <span>음성으로 입력하기</span>
+      </button>
+
+      <button id="btnAnalyze" class="btn btn-analyze" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m21.64 3.64-1.28-1.28a1.21 1.21 0 0 0-1.72 0L2.36 18.64a1.21 1.21 0 0 0 0 1.72l1.28 1.28a1.2 1.2 0 0 0 1.72 0L21.64 5.36a1.2 1.2 0 0 0 0-1.72Z"></path>
+          <path d="m14 7 3 3"></path>
+          <path d="M5 6v4"></path>
+          <path d="M19 14v4"></path>
+          <path d="M10 2v2"></path>
+          <path d="M7 8H3"></path>
+          <path d="M21 16h-4"></path>
+          <path d="M11 3H9"></path>
+        </svg>
+        <span>분석 요청하기</span>
+      </button>
+    </div>
+
+    <!-- 4. AI 답변 영역 -->
+    <div class="response-section">
+      <h2 class="response-title">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        AI의 답변
+      </h2>
+      <div id="aiResponse" class="response-box">여기에 AI답변이 표시됩니다.</div>
+    </div>
+  </div>
+
+  <script>
+    const diaryInput = document.getElementById('diaryInput');
+    const btnVoice = document.getElementById('btnVoice');
+    const btnAnalyze = document.getElementById('btnAnalyze');
+    const aiResponse = document.getElementById('aiResponse');
+
+    // 음성 인식 (Web Speech API) 기능 연결
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    let isRecording = false;
+    let initialText = '';
+
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.lang = 'ko-KR';
+      recognition.continuous = false; // 발화가 끝나면 자동으로 인식 종료
+      recognition.interimResults = true; // 실시간 텍스트 변환 반영
+
+      // 음성 인식이 시작되면 버튼의 텍스트를 '음성 인식 중'으로 변경
+      recognition.onstart = () => {
+        isRecording = true;
+        btnVoice.classList.add('recording');
+        btnVoice.querySelector('span').textContent = '음성 인식 중';
+
+        // 기존에 작성된 텍스트가 있을 경우 자연스럽게 이어지도록 공백 처리
+        initialText = diaryInput.value;
+        if (initialText && !initialText.endsWith(' ') && !initialText.endsWith('\n')) {
+          initialText += ' ';
+        }
+      };
+
+      // 사용자가 말을 하면 음성을 텍스트로 변환하여 입력창에 자동 반영
+      recognition.onresult = (event) => {
+        let transcript = '';
+        for (let i = 0; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        diaryInput.value = initialText + transcript;
+        diaryInput.scrollTop = diaryInput.scrollHeight;
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+        stopRecording();
+        if (event.error === 'network') {
+          alert('음성 인식 네트워크 오류가 발생했습니다.\n\n[해결 방법]\n1. 파일을 직접 더블클릭하여 file:// 로 연 경우 보안 정책상 차단될 수 있습니다.\n   터미널에서 `node server.js` 실행 후 http://localhost:3000 으로 접속해 보세요.\n2. PC의 인터넷 연결 상태를 확인해 주세요.');
+        } else if (event.error === 'not-allowed') {
+          alert('마이크 사용 권한이 차단되어 있습니다. 브라우저 주소창 좌측 아이콘을 클릭하여 마이크 권한을 허용해 주세요.');
+        } else if (event.error !== 'no-speech' && event.error !== 'aborted') {
+          alert('음성 인식 오류: ' + event.error);
+        }
+      };
+
+      // 인식이 끝나면 '음성으로 입력하기'로 복원
+      recognition.onend = () => {
+        stopRecording();
+      };
+    }
+
+    function stopRecording() {
+      isRecording = false;
+      btnVoice.classList.remove('recording');
+      btnVoice.querySelector('span').textContent = '음성으로 입력하기';
+    }
+
+    btnVoice.addEventListener('click', () => {
+      if (!recognition) {
+        alert('현재 브라우저에서는 음성 인식을 지원하지 않습니다. Chrome 브라우저를 이용해 주세요.');
+        return;
+      }
+
+      if (isRecording) {
+        recognition.stop();
+      } else {
+        try {
+          recognition.start();
+        } catch (e) {
+          console.error('Recognition start error:', e);
+        }
+      }
+    });
+
+    // 분석 요청하기: Google Gemini API 백엔드 연동
+    btnAnalyze.addEventListener('click', async () => {
+      const text = diaryInput.value.trim();
+      if (!text) {
+        alert('오늘 하루에 대한 이야기를 먼저 작성해주세요!');
+        diaryInput.focus();
+        return;
+      }
+
+      btnAnalyze.disabled = true;
+      btnAnalyze.style.opacity = '0.7';
+      aiResponse.classList.remove('has-content');
+      aiResponse.textContent = 'Gemini AI가 당신의 일기를 읽고 분석하는 중입니다... 💭✨';
+
+      try {
+        const response = await fetch('/api/analyze', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ diaryText: text })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || '분석 중 오류가 발생했습니다.');
+        }
+
+        aiResponse.classList.add('has-content');
+        aiResponse.textContent = data.reply;
+
+        // 1. 일기 내용과 AI 답변을 로컬 스토리지에 저장
+        try {
+          localStorage.setItem('emotionDiary_text', text);
+          localStorage.setItem('emotionDiary_aiReply', data.reply);
+        } catch (storageErr) {
+          console.warn('로컬 스토리지 저장 실패:', storageErr);
+        }
+      } catch (error) {
+        console.error('Analysis error:', error);
+        aiResponse.classList.add('has-content');
+        aiResponse.textContent = `⚠️ 분석 실패:\n${error.message}`;
+      } finally {
+        btnAnalyze.disabled = false;
+        btnAnalyze.style.opacity = '1';
+      }
+    });
+
+    // 2. 페이지 처음 로드 시 로컬 스토리지 데이터 확인 및 복원
+    function restoreSavedData() {
+      try {
+        const savedText = localStorage.getItem('emotionDiary_text');
+        const savedAiReply = localStorage.getItem('emotionDiary_aiReply');
+
+        if (savedText) {
+          diaryInput.value = savedText;
+        }
+
+        if (savedAiReply) {
+          aiResponse.classList.add('has-content');
+          aiResponse.textContent = savedAiReply;
+        }
+      } catch (e) {
+        console.warn('로컬 스토리지 복원 실패:', e);
+      }
+    }
+
+    // 페이지 로드 시 즉시 복원 실행
+    restoreSavedData();
+  </script>
+</body>
+</html>
+
