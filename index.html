@@ -382,7 +382,7 @@
       } catch (error) {
         console.error('Analysis error:', error);
         aiResponse.classList.add('has-content');
-        aiResponse.textContent = `⚠️ 분석 실패:\n${error.message}\n\n[참고] .env 파일에 GEMINI_API_KEY가 올바르게 설정되었는지 확인해 주세요.`;
+        aiResponse.textContent = `⚠️ 분석 실패:\n${error.message}`;
       } finally {
         btnAnalyze.disabled = false;
         btnAnalyze.style.opacity = '1';
