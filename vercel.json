@@ -1,11 +1,10 @@
 {
-  "version": 2,
-  "functions": {
-    "api/analyze.js": {
-      "maxDuration": 30,
-      "memory": 1024
+  "rewrites": [
+    {
+      "source": "/",
+      "destination": "/index.html"
     }
-  },
+  ],
   "headers": [
     {
       "source": "/api/(.*)",
@@ -13,13 +12,8 @@
         {
           "key": "Cache-Control",
           "value": "no-store, no-cache, must-revalidate, proxy-revalidate"
-        },
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
         }
       ]
     }
   ]
 }
-
