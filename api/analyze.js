@@ -1,36 +1,114 @@
 // Vercel Serverless Function: /api/analyze
-// 보안: GEMINI_API_KEY는 클라이언트에 절대 노출되지 않으며 Vercel 서버리스 환경(Node.js)에서만 안전하게 실행됩니다.
+// 보안: GEMINI_API_KEY와 REDIS_URL은 Vercel 서버리스 환경(Node.js)에서만 안전하게 실행됩니다.
 
 const fs = require('fs');
 const path = require('path');
+const Redis = require('ioredis');
 
-// 로컬 환경(.env) 및 Vercel 환경변수 지원 헬퍼
-function getGeminiApiKey() {
-  // 1. Vercel 서버리스 환경변수 우선
-  if (process.env.GEMINI_API_KEY && process.env.GEMINI_API_KEY.trim() !== '') {
-    return process.env.GEMINI_API_KEY.trim();
+// 환경변수 로더 (Vercel 환경 및 로컬 .env.* 지원)
+function getEnvValue(key) {
+  if (process.env[key] && process.env[key].trim() !== '') {
+    return process.env[key].trim();
   }
 
-  // 2. 로컬 개발 환경용 (.env 파일 직접 파싱)
-  try {
-    const envPath = path.join(process.cwd(), '.env');
-    if (fs.existsSync(envPath)) {
-      const content = fs.readFileSync(envPath, 'utf8');
-      for (const line of content.split(/\r?\n/)) {
-        const trimmed = line.trim();
-        if (trimmed && !trimmed.startsWith('#')) {
-          const [k, ...vParts] = trimmed.split('=');
-          if (k.trim() === 'GEMINI_API_KEY') {
-            return vParts.join('=').trim().replace(/^['"]|['"]$/g, '');
+  const envFiles = [
+    '.env.production.local',
+    '.env.local',
+    '.env.development.local',
+    '.env'
+  ];
+
+  for (const file of envFiles) {
+    try {
+      const filePath = path.join(process.cwd(), file);
+      if (fs.existsSync(filePath)) {
+        const content = fs.readFileSync(filePath, 'utf8');
+        for (const line of content.split(/\r?\n/)) {
+          const trimmed = line.trim();
+          if (trimmed && !trimmed.startsWith('#')) {
+            const [k, ...vParts] = trimmed.split('=');
+            if (k.trim() === key) {
+              const val = vParts.join('=').trim().replace(/^['"]|['"]$/g, '');
+              if (val && val !== '[SENSITIVE]') {
+                return val;
+              }
+            }
           }
         }
       }
+    } catch {
+      // 파일 읽기 실패 무시
     }
-  } catch {
-    // 파일 시스템 읽기 불가 시 무시
   }
 
   return null;
+}
+
+// Redis 클라이언트 싱글톤 인스턴스 (서버리스 웜 컨테이너에서 커넥션 재사용)
+let redisClient = null;
+
+function getRedisClient() {
+  const redisUrl = getEnvValue('REDIS_URL');
+  if (!redisUrl) {
+    return null;
+  }
+
+  if (!redisClient) {
+    redisClient = new Redis(redisUrl, {
+      maxRetriesPerRequest: 3,
+      connectTimeout: 5000,
+      lazyConnect: true,
+      enableReadyCheck: false,
+      retryStrategy(times) {
+        if (times > 3) return null;
+        return Math.min(times * 100, 2000);
+      }
+    });
+
+    redisClient.on('error', (err) => {
+      console.warn('[Redis Client Warning]:', err.message);
+    });
+  }
+
+  return redisClient;
+}
+
+// 현재 한국 시간(KST) 기준 고유 ID 생성 (예: 'diary-202609121600' 형식)
+function generateDiaryId() {
+  const now = new Date();
+  const utc = now.getTime() + (now.getTimezoneOffset() * 60 * 1000);
+  const kst = new Date(utc + (9 * 60 * 60 * 1000));
+
+  const pad = (n) => String(n).padStart(2, '0');
+  const year = kst.getFullYear();
+  const month = pad(kst.getMonth() + 1);
+  const day = pad(kst.getDate());
+  const hours = pad(kst.getHours());
+  const minutes = pad(kst.getMinutes());
+  const seconds = pad(kst.getSeconds());
+
+  return `diary-${year}${month}${day}${hours}${minutes}${seconds}`;
+}
+
+// Serverless Redis에 일기 데이터 묶음 저장
+async function saveDiaryToRedis(diaryId, diaryData) {
+  const client = getRedisClient();
+  if (!client) {
+    console.warn('[Redis] REDIS_URL 환경변수가 설정되지 않아 저장을 건너뜁니다.');
+    return { success: false, reason: 'REDIS_URL_NOT_CONFIGURED' };
+  }
+
+  try {
+    if (client.status === 'wait') {
+      await client.connect();
+    }
+    await client.set(diaryId, JSON.stringify(diaryData));
+    console.log(`[Redis] 일기 데이터가 성공적으로 저장되었습니다. Key: ${diaryId}`);
+    return { success: true };
+  } catch (err) {
+    console.error('[Redis Error] 데이터 저장 중 오류 발생:', err.message);
+    return { success: false, reason: err.message };
+  }
 }
 
 module.exports = async function handler(req, res) {
@@ -84,8 +162,8 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // 5. 서버 환경변수에서 Gemini API 키 확인 (클라이언트에는 절대 전달되지 않음)
-    const apiKey = getGeminiApiKey();
+    // 5. 서버 환경변수에서 Gemini API 키 확인
+    const apiKey = getEnvValue('GEMINI_API_KEY');
     if (!apiKey || apiKey === 'your_gemini_api_key_here') {
       console.error('[Security/Config Error] GEMINI_API_KEY 환경변수가 설정되지 않았습니다.');
       return res.status(500).json({
@@ -94,10 +172,10 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // 6. Gemini API 호출 (최신 및 안정화된 모델 목록을 순차 시도)
+    // 6. Gemini API 호출 (안정적인 모델 순차 시도)
     const targetModels = [
-      'gemini-3.6-flash',
       'gemini-3.5-flash',
+      'gemini-3.6-flash',
       'gemini-flash-latest'
     ];
 
@@ -108,7 +186,7 @@ module.exports = async function handler(req, res) {
 
     for (const model of targetModels) {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15초 타임아웃 방지
+      const timeoutId = setTimeout(() => controller.abort(), 25000);
 
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
@@ -144,11 +222,10 @@ module.exports = async function handler(req, res) {
         const candidateText = data.candidates?.[0]?.content?.parts?.[0]?.text;
         if (candidateText && candidateText.trim()) {
           reply = candidateText.trim();
-          break; // 성공 시 루프 종료
+          break;
         }
       } catch (err) {
         clearTimeout(timeoutId);
-        // 에러 메시지 내 API 키 유출 방지 마스킹
         lastErrorMessage = (err.message || 'Unknown error').replace(new RegExp(apiKey, 'g'), '***');
         console.warn(`[Gemini API] 모델(${model}) 호출 실패:`, lastErrorMessage);
       }
@@ -161,10 +238,24 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // 7. 성공 결과 반환 (reply 필드는 기존 프론트엔드와 100% 호환)
+    // 7. 현재 시간을 기준으로 고유 ID 생성 및 Serverless Redis에 일기 묶음 데이터 저장
+    const diaryId = generateDiaryId();
+    const createdAt = new Date().toISOString();
+    const diaryData = {
+      id: diaryId,
+      diaryText: diaryText,
+      aiReply: reply,
+      createdAt: createdAt
+    };
+
+    const redisResult = await saveDiaryToRedis(diaryId, diaryData);
+
+    // 8. 성공 결과 반환 (프론트엔드 호환을 위해 reply 필드 유지 + 고유 ID 및 Redis 저장 상태 포함)
     return res.status(200).json({
       success: true,
-      reply: reply
+      reply: reply,
+      diaryId: diaryId,
+      savedToRedis: redisResult.success
     });
 
   } catch (error) {
