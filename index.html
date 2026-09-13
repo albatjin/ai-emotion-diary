@@ -7,8 +7,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <!-- Supabase 공식 JS SDK (CDN) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Supabase 공식 JS SDK (로컬 UMD 번들 우선 로드 후 CDN 폴백) -->
+  <script src="./supabase.js"></script>
+  <script>
+    if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>');
+    }
+  </script>
+  <script>
+    // SDK 모듈 객체를 즉시 보존하여 전역 변수 충돌 방지
+    if (window.supabase && typeof window.supabase.createClient === 'function') {
+      window.SupabaseSDK = window.supabase;
+    }
+  </script>
   <style>
     * {
       box-sizing: border-box;
@@ -560,6 +571,209 @@
       font-family: inherit;
     }
 
+    /* 8. 실시간 채팅 섹션 스타일 */
+    .chat-section {
+      border-top: 1.5px dashed #e2e8f0;
+      padding-top: 28px;
+      margin-top: 32px;
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .chat-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chat-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      background-color: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+    }
+
+    .chat-status-dot {
+      width: 7px;
+      height: 7px;
+      background-color: #10b981;
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse 2s infinite;
+    }
+
+    .chat-messages-container {
+      height: 320px;
+      overflow-y: auto;
+      background-color: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-messages-container::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .chat-messages-container::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 9999px;
+    }
+
+    .chat-empty {
+      margin: auto;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .chat-bubble-wrapper {
+      display: flex;
+      flex-direction: column;
+      max-width: 78%;
+    }
+
+    .chat-bubble-wrapper.mine {
+      align-self: flex-end;
+      align-items: flex-end;
+    }
+
+    .chat-bubble-wrapper.other {
+      align-self: flex-start;
+      align-items: flex-start;
+    }
+
+    .chat-sender-info,
+    .chat-sender-name {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #64748b;
+      margin-bottom: 4px;
+      padding: 0 2px;
+    }
+
+    .chat-bubble-wrapper.mine .chat-sender-info,
+    .chat-bubble-wrapper.mine .chat-sender-name {
+      color: #4f46e5;
+      justify-content: flex-end;
+    }
+
+    .chat-sender-email {
+      font-weight: 600;
+      word-break: break-all;
+    }
+
+    .chat-bubble {
+      padding: 10px 14px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      word-break: break-word;
+      white-space: pre-wrap;
+    }
+
+    .chat-bubble-wrapper.mine .chat-bubble {
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 3px 10px rgba(79, 70, 229, 0.2);
+    }
+
+    .chat-bubble-wrapper.other .chat-bubble {
+      background: #ffffff;
+      color: #1e293b;
+      border: 1px solid #e2e8f0;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+    }
+
+    .chat-timestamp {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 4px;
+      padding: 0 4px;
+    }
+
+    .chat-input-form {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 13px 16px;
+      font-size: 14px;
+      color: #1e293b;
+      background-color: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .chat-input:focus {
+      background-color: #ffffff;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    }
+
+    .chat-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .btn-send-chat {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 13px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffffff;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 3px 10px rgba(79, 70, 229, 0.25);
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .btn-send-chat:hover {
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 5px 14px rgba(79, 70, 229, 0.32);
+    }
+
+    .btn-send-chat:active {
+      transform: translateY(0);
+    }
+
     @media (max-width: 480px) {
       .container {
         padding: 24px 16px;
@@ -577,6 +791,9 @@
       }
       .auth-button-group {
         flex-direction: column;
+      }
+      .chat-messages-container {
+        height: 260px;
       }
     }
   </style>
@@ -752,6 +969,50 @@
         <div class="loading-state">Serverless Redis에서 히스토리를 불러오는 중입니다... 💭</div>
       </div>
     </div>
+
+    <!-- 6. 실시간 채팅 섹션 -->
+    <div class="chat-section">
+      <div class="chat-header">
+        <!-- 1. '실시간 채팅'이라는 소제목 -->
+        <h2 class="chat-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+          </svg>
+          실시간 채팅
+        </h2>
+        <span id="chatStatusBadge" class="chat-status-badge">
+          <span class="chat-status-dot"></span>
+          실시간 연결됨
+        </span>
+      </div>
+
+      <!-- 2. 채팅 메시지들이 표시될 스크롤 가능한 영역 -->
+      <div id="chatMessages" class="chat-messages-container" tabindex="0" role="log" aria-live="polite">
+        <div class="chat-empty">
+          💬 아직 대화가 없습니다.<br>
+          첫 번째 메시지를 남겨 실시간 대화를 시작해보세요!
+        </div>
+      </div>
+
+      <!-- 3. 하단 메시지 입력 input 창과 '전송' 버튼 -->
+      <form id="chatForm" class="chat-input-form" onsubmit="return false;">
+        <input 
+          type="text" 
+          id="chatInput" 
+          class="chat-input" 
+          placeholder="메시지를 입력하세요..." 
+          maxlength="500"
+          autocomplete="off"
+        />
+        <button id="btnSendChat" class="btn-send-chat" type="submit">
+          <span>전송</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </form>
+    </div>
   </div>
 
   <script>
@@ -776,22 +1037,70 @@
     const historyCount = document.getElementById('historyCount');
     const btnRefreshHistory = document.getElementById('btnRefreshHistory');
 
+    // 실시간 채팅 관련 DOM 요소
+    const chatMessages = document.getElementById('chatMessages');
+    const chatForm = document.getElementById('chatForm');
+    const chatInput = document.getElementById('chatInput');
+    const btnSendChat = document.getElementById('btnSendChat');
+    const chatStatusBadge = document.getElementById('chatStatusBadge');
+
     // 💡 API 베이스 URL (file:/// 로 열었을 경우 자동으로 localhost:3000 연동)
     const API_BASE_URL = window.location.protocol.startsWith('http') ? '' : 'http://localhost:3000';
 
     // --- Supabase 클라이언트 설정 및 초기화 ---
-    // 💡 CDN에서 로드된 window.supabase 객체를 백업하고, var를 사용하여 식별자 중복 선언(SyntaxError)을 방지합니다.
-    const supabaseSDK = window.supabase;
     var supabase = null;
     var isSupabaseConnected = false;
 
     // 💡 Supabase 프로젝트 설정 (실제 확인 이메일을 받으려면 본인의 Supabase URL과 Key를 입력하세요)
     const SUPABASE_CONFIG = {
-      url: 'https://kxlebrmrcxngqylgkynj.supabase.co' ,       // 예: 'https://your-project.supabase.co'
-      anonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4bGVicm1yY3huZ3F5bGdreW5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxODM1MDUsImV4cCI6MjEwNDc1OTUwNX0.PG13MD6G2l0N39NRhHk8aY3qkl9hL_Xjngjd7TgLic0' // 예: 'eyJhbGciOiJIUzI1NiIsIn...'
+      url: 'https://kxlebrmrcxngqylgkynj.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4bGVicm1yY3huZ3F5bGdreW5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxODM1MDUsImV4cCI6MjEwNDc1OTUwNX0.PG13MD6G2l0N39NRhHk8aY3qkl9hL_Xjngjd7TgLic0'
     };
 
+    // Supabase SDK 로드 대기 및 동적 로드 헬퍼 (로컬/CDN 이중 보장)
+    async function waitForSupabaseSDK(timeoutMs = 6000) {
+      function checkSDK() {
+        if (window.SupabaseSDK && typeof window.SupabaseSDK.createClient === 'function') {
+          return window.SupabaseSDK;
+        }
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+          window.SupabaseSDK = window.supabase;
+          return window.supabase;
+        }
+        return null;
+      }
+
+      let sdk = checkSDK();
+      if (sdk) return sdk;
+
+      // 만약 스크립트 로드가 안 된 경우 동적 스크립트 주입
+      try {
+        if (!document.getElementById('supabase-dynamic-script')) {
+          const s = document.createElement('script');
+          s.id = 'supabase-dynamic-script';
+          s.src = './supabase.js';
+          s.onerror = () => {
+            s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+          };
+          document.head.appendChild(s);
+        }
+      } catch (e) {}
+
+      const start = Date.now();
+      while ((Date.now() - start) < timeoutMs) {
+        sdk = checkSDK();
+        if (sdk) return sdk;
+        await new Promise(r => setTimeout(r, 60));
+      }
+      return checkSDK();
+    }
+
     async function initSupabase() {
+      // 이미 공식 클라이언트가 연결되어 있으면 재사용
+      if (supabase && isSupabaseConnected && typeof supabase.from === 'function') {
+        return supabase;
+      }
+
       let supabaseUrl = SUPABASE_CONFIG.url;
       let supabaseAnonKey = SUPABASE_CONFIG.anonKey;
 
@@ -811,19 +1120,31 @@
         }
       }
 
-      // 2. Supabase SDK 및 유효한 URL/키가 있는 경우 공식 클라이언트 생성
-      if (supabaseSDK && supabaseUrl && supabaseAnonKey && supabaseUrl !== '[SENSITIVE]' && supabaseUrl.startsWith('http')) {
+      // 2. Supabase SDK 로드 대기
+      const sdk = await waitForSupabaseSDK();
+
+      // 3. Supabase SDK 및 유효한 URL/키가 있는 경우 공식 클라이언트 생성
+      if (sdk && supabaseUrl && supabaseAnonKey && supabaseUrl !== '[SENSITIVE]' && supabaseUrl.startsWith('http')) {
         try {
-          supabase = supabaseSDK.createClient(supabaseUrl, supabaseAnonKey);
+          supabase = sdk.createClient(supabaseUrl, supabaseAnonKey, {
+            auth: {
+              persistSession: true,
+              autoRefreshToken: true,
+              detectSessionInUrl: true
+            }
+          });
+          window.supabaseClient = supabase;
+          window.supabase = supabase;
           isSupabaseConnected = true;
           console.log('✨ Supabase 공식 클라이언트가 성공적으로 연결되었습니다.');
+          return supabase;
         } catch (err) {
           console.warn('Supabase createClient 오류:', err);
         }
       }
 
-      // 3. 환경변수/키 미설정 또는 file:/// 직접 실행 시에도 에러 없이 동작하도록 Fallback 클라이언트 제공
-      if (!supabase) {
+      // 4. 공식 SDK 로드 실패 시 Fallback 클라이언트 제공
+      if (!supabase || typeof supabase.from !== 'function') {
         isSupabaseConnected = false;
         supabase = {
           auth: {
@@ -832,11 +1153,7 @@
               saveUser(email, password);
               return {
                 data: {
-                  user: {
-                    id: 'demo-' + Date.now(),
-                    email: email,
-                    confirmed_at: null
-                  },
+                  user: { id: 'demo-' + Date.now(), email: email, confirmed_at: null },
                   session: null
                 },
                 error: null
@@ -856,7 +1173,6 @@
                   return { data: { user: null, session: null }, error: { message: '비밀번호가 일치하지 않습니다.' } };
                 }
               }
-              // 신규 계정일 경우 자동 등록 후 로그인 지원
               saveUser(email, password);
               return {
                 data: { user: { id: 'demo-' + Date.now(), email: email }, session: { user: { email: email } } },
@@ -864,7 +1180,6 @@
               };
             },
             signInWithOAuth: async ({ provider }) => {
-              console.log('[Supabase Demo Client] signInWithOAuth 호출:', provider);
               const demoUser = {
                 id: 'demo-google-' + Date.now(),
                 email: 'google.user@gmail.com',
@@ -875,7 +1190,6 @@
               return { data: { provider, url: null }, error: null };
             },
             signOut: async () => {
-              console.log('[Supabase Demo Client] signOut 호출');
               removeAuthSession();
               return { error: null };
             },
@@ -896,9 +1210,20 @@
             onAuthStateChange: (callback) => {
               return { data: { subscription: { unsubscribe: () => {} } } };
             }
-          }
+          },
+          from: (table) => ({
+            insert: async () => {
+              throw new Error('Supabase 공식 클라이언트가 로드되지 않았습니다. 브라우저의 인터넷 연결 및 광고차단/확장 프로그램을 확인해 주세요.');
+            },
+            select: () => ({
+              order: () => ({
+                limit: async () => ({ data: [], error: null })
+              })
+            })
+          })
         };
       }
+      return supabase;
     }
 
     // --- 인증(Auth) 상태 관리 로직 ---
@@ -1080,6 +1405,7 @@
       cleanupLegacyHistoryCaches(user.id);
       restoreUserDraft(user.id);
       loadDiaryHistory();
+      initRealtimeChat(user);
     }
 
     // 이메일 유효성 검사
@@ -1287,6 +1613,8 @@
       } catch (err) {
         console.warn('Supabase signOut 호출 중 오류:', err);
       } finally {
+        // 실시간 채팅 정리
+        leaveRealtimeChat();
         // 로컬 세션 삭제 및 캐시 정리 후 다시 로그인 폼 보여주기
         removeAuthSession();
         cleanupLegacyHistoryCaches(null);
@@ -1300,6 +1628,395 @@
     btnSignup.addEventListener('click', handleSignup);
     btnGoogleLogin.addEventListener('click', handleGoogleLogin);
     btnLogout.addEventListener('click', handleLogout);
+
+    // ==========================================
+    // 💡 실시간 채팅 (Realtime Chat) 기능 모듈
+    // ==========================================
+    const CHAT_STORAGE_KEY = 'emotion_diary_realtime_chat_msgs';
+    let chatBroadcastChannel = null;
+    let supabaseChatChannel = null;
+    let currentChatUser = null;
+    let chatMessagesList = [];
+
+    // 채팅 시간 포맷 헬퍼 (예: 오후 3:24)
+    function formatChatTime(isoString) {
+      if (!isoString) return '';
+      try {
+        const d = new Date(isoString);
+        let hours = d.getHours();
+        const minutes = String(d.getMinutes()).padStart(2, '0');
+        const ampm = hours >= 12 ? '오후' : '오전';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        return `${ampm} ${hours}:${minutes}`;
+      } catch (e) {
+        return '';
+      }
+    }
+
+    // 로컬 스토리지에서 채팅 내역 불러오기
+    function getStoredChatMessages() {
+      try {
+        const data = localStorage.getItem(CHAT_STORAGE_KEY);
+        return data ? JSON.parse(data) : [];
+      } catch (e) {
+        console.warn('채팅 내역 로드 오류:', e);
+        return [];
+      }
+    }
+
+    // 로컬 스토리지에 채팅 내역 저장 (최근 100개 유지)
+    function saveStoredChatMessages(messages) {
+      try {
+        const trimmed = messages.slice(-100);
+        localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(trimmed));
+      } catch (e) {
+        console.warn('채팅 내역 저장 실패:', e);
+      }
+    }
+
+    // 개별 채팅 메시지 DOM 엘리먼트 렌더링 및 추가
+    function renderChatMessage(msg, autoScroll = true) {
+      if (!chatMessages || !msg) return;
+
+      // 빈 상태 안내 문구 제거
+      const emptyNotice = chatMessages.querySelector('.chat-empty');
+      if (emptyNotice) {
+        emptyNotice.remove();
+      }
+
+      const email = msg.user_email || msg.senderEmail || '';
+      const contentText = msg.content !== undefined ? msg.content : (msg.text || '');
+
+      // 본인 메시지 판별 (이메일 또는 user_id 기준)
+      const isMine = Boolean(
+        currentChatUser && (
+          (currentChatUser.email && email && email.toLowerCase() === currentChatUser.email.toLowerCase()) ||
+          (currentChatUser.id && msg.user_id && msg.user_id === currentChatUser.id) ||
+          (currentChatUser.id && msg.senderId && msg.senderId === currentChatUser.id)
+        )
+      );
+
+      const wrapper = document.createElement('div');
+      wrapper.className = `chat-bubble-wrapper ${isMine ? 'mine' : 'other'}`;
+      wrapper.setAttribute('data-msg-id', msg.id);
+
+      // 4. 각 메시지 옆에 보낸사람의 이메일(user_email 컬럼)을 함께 표시
+      const emailLabel = isMine ? `${email} (나)` : (email || '익명');
+      const timeStr = formatChatTime(msg.created_at || msg.timestamp);
+
+      wrapper.innerHTML = `
+        <div class="chat-sender-info">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+            <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+          </svg>
+          <span class="chat-sender-email">${escapeHtml(emailLabel)}</span>
+        </div>
+        <div class="chat-bubble">${escapeHtml(contentText)}</div>
+        <span class="chat-timestamp">${timeStr}</span>
+      `;
+
+      chatMessages.appendChild(wrapper);
+
+      if (autoScroll) {
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+    }
+
+    // 전체 메시지 목록 렌더링
+    function renderAllChatMessages() {
+      if (!chatMessages) return;
+      chatMessages.innerHTML = '';
+
+      if (!chatMessagesList || chatMessagesList.length === 0) {
+        chatMessages.innerHTML = `
+          <div class="chat-empty">
+            💬 아직 대화가 없습니다.<br>
+            첫 번째 메시지를 남겨 실시간 대화를 시작해보세요!
+          </div>
+        `;
+        return;
+      }
+
+      chatMessagesList.forEach(msg => {
+        renderChatMessage(msg, false);
+      });
+
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    // 수신된 새 메시지 처리 (중복 방지 및 렌더링)
+    function handleIncomingChatMessage(newMsg) {
+      if (!newMsg || newMsg.id === undefined || newMsg.id === null) return;
+
+      // 이미 목록에 존재하는 메시지인지 검사 (중복 렌더링 방지)
+      const exists = chatMessagesList.some(item => String(item.id) === String(newMsg.id));
+      if (exists) return;
+
+      chatMessagesList.push(newMsg);
+      saveStoredChatMessages(chatMessagesList);
+      renderChatMessage(newMsg, true);
+    }
+
+    // 3. 페이지가 처음 열릴 때, 기존에 있던 메시지들도 모두 가져와서 화면에 미리 표시
+    async function loadSupabaseMessages() {
+      if (!supabase || typeof supabase.from !== 'function') {
+        await initSupabase();
+      }
+
+      if (supabase && typeof supabase.from === 'function') {
+        try {
+          console.log('📥 Supabase message 테이블에서 기존 메시지 조회 중...');
+          const { data, error } = await supabase
+            .from('message')
+            .select('*')
+            .order('id', { ascending: true })
+            .limit(200);
+
+          if (error) {
+            console.warn('Supabase message 조회 오류:', error);
+          } else if (Array.isArray(data)) {
+            console.log(`✅ 기존 메시지 ${data.length}개 로드 완료`);
+            chatMessagesList = data.map(row => ({
+              id: row.id,
+              user_id: row.user_id,
+              user_email: row.user_email,
+              content: row.content,
+              created_at: row.created_at || (row.id ? new Date(Number(row.id)).toISOString() : new Date().toISOString())
+            }));
+            saveStoredChatMessages(chatMessagesList);
+            renderAllChatMessages();
+            return;
+          }
+        } catch (e) {
+          console.warn('Supabase message 조회 예외:', e);
+        }
+      }
+
+      // Supabase 조회 실패 또는 미연결 시 로컬 캐시 사용
+      chatMessagesList = getStoredChatMessages();
+      renderAllChatMessages();
+    }
+
+    // 메시지 전송 로직 (Supabase 'message' 테이블 insert 연동)
+    async function sendChatMessage() {
+      if (!chatInput) return;
+      const text = chatInput.value.trim();
+      if (!text) {
+        chatInput.focus();
+        return;
+      }
+
+      const email = currentChatUser?.email || '';
+      if (!email) {
+        alert('로그인 후 메시지를 전송할 수 있습니다.');
+        return;
+      }
+
+      // 전송 버튼 비활성화 (중복 클릭 방지)
+      if (btnSendChat) {
+        btnSendChat.disabled = true;
+        btnSendChat.style.opacity = '0.7';
+      }
+
+      try {
+        // 1. Supabase 공식 클라이언트 확인 및 재초기화 시도
+        if (!supabase || !isSupabaseConnected || typeof supabase.from !== 'function') {
+          console.log('🔄 Supabase 클라이언트 연결 확인 중...');
+          await initSupabase();
+        }
+
+        if (!supabase || typeof supabase.from !== 'function') {
+          throw new Error('Supabase 클라이언트가 연결되지 않았습니다. 인터넷 연결 및 브라우저 설정을 확인해 주세요.');
+        }
+
+        console.log('📤 Supabase message 테이블 insert 요청:', { content: text, user_email: email });
+
+        // 💡 id 컬럼이 NOT NULL이면서 테이블에 자동 증가(Identity)가 빠진 경우를 대비해 고유 타임스탬프(bigint) 제공
+        const messagePayload = {
+          id: Date.now(),
+          content: text,
+          user_email: email
+        };
+
+        // 💡 요구사항: supabase.from('message').insert(...)
+        const { data, error } = await supabase
+          .from('message')
+          .insert(messagePayload);
+
+        if (error) {
+          console.error('❌ Supabase message insert 에러:', error);
+          if (error.code === '42501') {
+            throw new Error(
+              `Supabase RLS(행 보안 정책) 권한 오류 (코드 42501):\n\n` +
+              `현재 계정이 Supabase에 로그인되지 않았거나, "message" 테이블의 INSERT 정책(Policy)이 활성화되지 않았습니다.\n\n` +
+              `해결 방법:\n` +
+              `1. 현재 화면에서 로그아웃 후 다시 로그인해 보세요.\n` +
+              `2. Supabase 대시보드 > Table Editor > message > RLS Policies에서 "Enable insert for authenticated users" 또는 "Enable insert for anon/all" 정책이 있는지 확인해 주세요.`
+            );
+          }
+          throw new Error(error.message || 'Supabase 테이블 저장 실패');
+        }
+
+        console.log('✅ Supabase message 테이블 insert 성공!');
+
+        // 메시지 객체 구성
+        const newMsg = {
+          id: messagePayload.id,
+          user_id: currentChatUser?.id || '',
+          user_email: email,
+          content: text,
+          created_at: new Date().toISOString()
+        };
+
+        // 1. 로컬 상태 반영 및 UI 렌더링
+        handleIncomingChatMessage(newMsg);
+
+        // 2. 브라우저 탭 간 BroadcastChannel 전파
+        if (chatBroadcastChannel) {
+          try {
+            chatBroadcastChannel.postMessage(newMsg);
+          } catch (err) {
+            console.warn('BroadcastChannel 전송 실패:', err);
+          }
+        }
+
+        // 3. 💡 요구사항: 메시지 전송이 성공하면, 입력창의 내용은 깨끗하게 비워주기
+        chatInput.value = '';
+        chatInput.focus();
+
+      } catch (err) {
+        console.error('메시지 전송 실패:', err);
+        alert(err.message || '메시지 전송 중 오류가 발생했습니다.');
+      } finally {
+        if (btnSendChat) {
+          btnSendChat.disabled = false;
+          btnSendChat.style.opacity = '1';
+        }
+      }
+    }
+
+    // 다른 탭에서의 localStorage 변경 감지 (폴백 동기화)
+    function handleChatStorageEvent(e) {
+      if (e.key === CHAT_STORAGE_KEY && e.newValue) {
+        try {
+          const updated = JSON.parse(e.newValue);
+          if (Array.isArray(updated)) {
+            // 새로 들어온 메시지들만 식별하여 추가
+            updated.forEach(msg => {
+              if (msg && msg.id && !chatMessagesList.some(item => item.id === msg.id)) {
+                chatMessagesList.push(msg);
+                renderChatMessage(msg, true);
+              }
+            });
+          }
+        } catch (err) {
+          console.warn('채팅 스토리지 동기화 실패:', err);
+        }
+      }
+    }
+
+    // 실시간 채팅 초기화
+    function initRealtimeChat(user) {
+      currentChatUser = user;
+
+      // Supabase message 테이블 및 로컬 캐시에서 이전 대화 불러오기
+      loadSupabaseMessages();
+
+      // 브라우저 탭 간 실시간 통신 (BroadcastChannel) 설정
+      if (typeof BroadcastChannel !== 'undefined') {
+        if (!chatBroadcastChannel) {
+          try {
+            chatBroadcastChannel = new BroadcastChannel('emotion_diary_realtime_chat');
+            chatBroadcastChannel.onmessage = (event) => {
+              if (event && event.data) {
+                handleIncomingChatMessage(event.data);
+              }
+            };
+          } catch (e) {
+            console.warn('BroadcastChannel 생성 오류:', e);
+          }
+        }
+      }
+
+      // 1. 요구사항: supabase.channel('message').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'message' }, callback).subscribe() 형태 사용
+      if (supabase && typeof supabase.channel === 'function' && !supabaseChatChannel) {
+        try {
+          supabaseChatChannel = supabase
+            .channel('message')
+            .on(
+              'postgres_changes',
+              { event: 'INSERT', schema: 'public', table: 'message' },
+              (payload) => {
+                console.log('⚡ [Realtime INSERT 이벤트 발생]:', payload);
+                if (payload && payload.new) {
+                  const row = payload.new;
+                  // 2. 새로운 메시지가 도착하면 그 메시지 데이터를 화면의 채팅 메시지 영역에 추가해서 보여줌
+                  const newMsg = {
+                    id: row.id,
+                    user_id: row.user_id,
+                    user_email: row.user_email,
+                    content: row.content,
+                    created_at: row.created_at || (row.id ? new Date(Number(row.id)).toISOString() : new Date().toISOString())
+                  };
+                  handleIncomingChatMessage(newMsg);
+                }
+              }
+            )
+            .subscribe((status, err) => {
+              console.log('⚡ Supabase "message" 채널 구독 상태:', status, err || '');
+              if (chatStatusBadge) {
+                if (status === 'SUBSCRIBED') {
+                  chatStatusBadge.innerHTML = '<span class="chat-status-dot"></span>실시간 연결됨';
+                }
+              }
+            });
+        } catch (err) {
+          console.warn('Supabase Realtime 채널 설정 실패:', err);
+        }
+      }
+
+      // 스토리지 변경 이벤트 리스너 등록
+      window.removeEventListener('storage', handleChatStorageEvent);
+      window.addEventListener('storage', handleChatStorageEvent);
+    }
+
+    // 채팅 종료 및 정리 (로그아웃 시 호출)
+    function leaveRealtimeChat() {
+      currentChatUser = null;
+      if (supabaseChatChannel && supabase && typeof supabase.removeChannel === 'function') {
+        try {
+          supabase.removeChannel(supabaseChatChannel);
+        } catch (e) {}
+        supabaseChatChannel = null;
+      }
+      window.removeEventListener('storage', handleChatStorageEvent);
+    }
+
+    // 채팅 폼 및 버튼 이벤트 연결
+    if (chatForm) {
+      chatForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        sendChatMessage();
+      });
+    }
+
+    if (btnSendChat) {
+      btnSendChat.addEventListener('click', (e) => {
+        e.preventDefault();
+        sendChatMessage();
+      });
+    }
+
+    if (chatInput) {
+      chatInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+          e.preventDefault();
+          sendChatMessage();
+        }
+      });
+    }
 
     // Enter 키로 편리한 로그인 지원
     authEmail.addEventListener('keydown', (e) => {
