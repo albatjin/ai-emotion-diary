@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const Redis = require('ioredis');
+const { verifyAuthToken } = require('../lib/supabase');
 
 // 환경변수 로더 (Vercel 환경 및 로컬 .env.* 지원)
 function getEnvValue(key) {
@@ -73,6 +74,25 @@ function getRedisClient() {
   return redisClient;
 }
 
+// 로컬 파일(data/diaries.json)에서 일기 조회 (Redis 미설정 환경 지원, 엄격한 사용자별 격리)
+function getLocalDiaries(userId) {
+  try {
+    const filePath = path.join(process.cwd(), 'data', 'diaries.json');
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      const list = JSON.parse(content);
+      if (Array.isArray(list)) {
+        if (!userId) return [];
+        // 오직 현재 로그인한 사용자 본인의 일기만 엄격하게 반환 (타인 또는 공용 일기 제외)
+        return list.filter(item => item && item.userId === userId);
+      }
+    }
+  } catch (e) {
+    console.warn('[Local Diaries] 로컬 파일 읽기 오류:', e.message);
+  }
+  return [];
+}
+
 module.exports = async function handler(req, res) {
   // 1. CORS 및 보안 헤더 설정
   res.setHeader('Access-Control-Allow-Credentials', 'true');
@@ -94,14 +114,28 @@ module.exports = async function handler(req, res) {
     });
   }
 
+  // 4. 세션 토큰 검증 및 사용자 ID 확인
+  const authHeader = req.headers.authorization || req.headers.Authorization;
+  const authResult = await verifyAuthToken(authHeader);
+  console.log('[History Debug] authHeader exists:', !!authHeader, 'authResult success:', authResult.success, 'userId:', authResult.userId);
+  if (!authResult.success) {
+    return res.status(401).json({
+      success: false,
+      error: authResult.error || '인증이 필요합니다. 다시 로그인해주세요.'
+    });
+  }
+  const userId = authResult.userId;
+
   try {
     const client = getRedisClient();
     if (!client) {
-      console.warn('[Redis History] REDIS_URL 환경변수가 설정되지 않았습니다.');
+      console.warn('[Redis History] REDIS_URL 미설정 -> 로컬 파일 저장소(data/diaries.json)에서 사용자별 일기를 조회합니다.');
+      const localDiaries = getLocalDiaries(userId);
+      console.log(`[History Debug] getLocalDiaries for userId '${userId}' returned count:`, localDiaries.length, 'IDs:', localDiaries.map(d => d.id));
       return res.status(200).json({
         success: true,
-        count: 0,
-        diaries: []
+        count: localDiaries.length,
+        diaries: localDiaries
       });
     }
 
@@ -109,8 +143,9 @@ module.exports = async function handler(req, res) {
       await client.connect();
     }
 
-    // 4. Redis에서 모든 일기 키('diary-*') 조회
-    const keys = await client.keys('diary-*');
+    // 5. Redis에서 현재 로그인 사용자의 일기 키('user:[사용자ID]:diary-*') 조회
+    const userPattern = `user:${userId}:diary-*`;
+    const keys = await client.keys(userPattern);
 
     if (!keys || keys.length === 0) {
       return res.status(200).json({
@@ -142,18 +177,21 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    // 6. 최신순 정렬 (ID 또는 createdAt 기준 내림차순)
-    diaries.sort((a, b) => {
+    // 6. 현재 사용자 ID 일치 2차 검증 필터링
+    const userDiaries = diaries.filter(item => item && item.userId === userId);
+
+    // 7. 최신순 정렬 (ID 또는 createdAt 기준 내림차순)
+    userDiaries.sort((a, b) => {
       const keyA = a.id || a.createdAt || '';
       const keyB = b.id || b.createdAt || '';
       return keyB.localeCompare(keyA);
     });
 
-    // 7. 결과 반환
+    // 8. 결과 반환
     return res.status(200).json({
       success: true,
-      count: diaries.length,
-      diaries: diaries
+      count: userDiaries.length,
+      diaries: userDiaries
     });
 
   } catch (error) {

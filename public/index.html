@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Supabase 공식 JS SDK (CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -346,6 +348,218 @@
       50% { opacity: 0.6; }
     }
 
+    /* 6. 로그인/회원가입 화면 스타일 */
+    .auth-container {
+      max-width: 440px;
+      margin: 40px auto;
+      text-align: center;
+    }
+
+    .auth-subtitle {
+      font-size: 14px;
+      color: #64748b;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 26px;
+      text-align: left;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrapper svg {
+      position: absolute;
+      left: 14px;
+      color: #94a3b8;
+      pointer-events: none;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 13px 14px 13px 42px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #1e293b;
+      background-color: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 12px;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .form-input:focus {
+      background-color: #ffffff;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    }
+
+    .form-input::placeholder {
+      color: #94a3b8;
+    }
+
+    .auth-message {
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      display: none;
+      line-height: 1.4;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .auth-message.error {
+      background-color: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
+    }
+
+    .auth-message.success {
+      background-color: #f0fdf4;
+      color: #16a34a;
+      border: 1px solid #bbf7d0;
+    }
+
+    .auth-button-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    .btn-login {
+      flex: 1.3;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+    }
+
+    .btn-login:hover {
+      background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.32);
+      transform: translateY(-1px);
+    }
+
+    .btn-signup {
+      flex: 1;
+      background-color: #f1f5f9;
+      color: #475569;
+      border: 1.5px solid #cbd5e1;
+    }
+
+    .btn-signup:hover {
+      background-color: #e2e8f0;
+      color: #1e293b;
+      border-color: #94a3b8;
+    }
+
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      margin: 8px 0;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .auth-divider span {
+      padding: 0 14px;
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    .btn-google {
+      width: 100%;
+      background-color: #ffffff;
+      color: #334155;
+      border: 1.5px solid #e2e8f0;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .btn-google:hover {
+      background-color: #f8fafc;
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+      transform: translateY(-1px);
+    }
+
+    .auth-footer-tip {
+      margin-top: 14px;
+      font-size: 12px;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    /* 7. 로그인 사용자 헤더 바 스타일 */
+    .user-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+      padding: 10px 16px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .user-email-badge {
+      font-weight: 600;
+      color: #4f46e5;
+    }
+
+    .btn-logout {
+      background: transparent;
+      border: 1px solid #cbd5e1;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
     @media (max-width: 480px) {
       .container {
         padding: 24px 16px;
@@ -361,12 +575,109 @@
         align-items: flex-start;
         gap: 6px;
       }
+      .auth-button-group {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  <!-- 1. 로그인 화면 (비로그인 사용자에게 기본 표시) -->
+  <div id="authContainer" class="container auth-container">
+    <div class="header">
+      <span class="badge">✨ AI 감정일기</span>
+      <!-- 요구사항: 'AI 감정일기'라는 제목 -->
+      <h1 class="title">AI 감정일기</h1>
+      <p class="auth-subtitle">오늘 하루의 마음을 편안하게 기록하고<br>AI 상담가의 따뜻한 위로와 피드백을 받아보세요.</p>
+    </div>
+
+    <form id="authForm" onsubmit="return false;" class="auth-form">
+      <!-- 이메일 입력 input창 -->
+      <div class="form-group">
+        <label for="authEmail" class="form-label">이메일</label>
+        <div class="input-wrapper">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+          </svg>
+          <input 
+            type="email" 
+            id="authEmail" 
+            class="form-input" 
+            placeholder="이메일을 입력하세요 (example@email.com)" 
+            autocomplete="email"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- 비밀번호 입력 input창 -->
+      <div class="form-group">
+        <label for="authPassword" class="form-label">비밀번호</label>
+        <div class="input-wrapper">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+          <input 
+            type="password" 
+            id="authPassword" 
+            class="form-input" 
+            placeholder="비밀번호를 입력하세요 (6자 이상)" 
+            autocomplete="current-password"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- 상태 안내 메시지 표시 박스 -->
+      <div id="authMessage" class="auth-message"></div>
+
+      <!-- '로그인' 버튼과 '회원가입' 버튼 -->
+      <div class="auth-button-group">
+        <button id="btnLogin" class="btn btn-login" type="button">
+          <span>로그인</span>
+        </button>
+        <button id="btnSignup" class="btn btn-signup" type="button">
+          <span>회원가입</span>
+        </button>
+      </div>
+
+      <!-- '또는' 텍스트 구분선 -->
+      <div class="auth-divider">
+        <span>또는</span>
+      </div>
+
+      <!-- 'Google로 로그인' 버튼 -->
+      <button id="btnGoogleLogin" class="btn btn-google" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+          <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+          <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.14-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+        </svg>
+        <span>Google로 로그인</span>
+      </button>
+
+      <div class="auth-footer-tip">
+        🔒 계정 정보는 안전하게 관리됩니다.
+      </div>
+    </form>
+  </div>
+
+  <!-- 2. 기존 일기장 화면 (로그인 성공 시 노출) -->
+  <div id="diaryContainer" class="container diary-container" style="display: none;">
+    <!-- 상단 로그인 사용자 바 -->
+    <div class="user-bar">
+      <div class="user-info">
+        <span>👤</span>
+        <span id="userEmailDisplay" class="user-email-badge"></span>
+        <span>님 환영합니다!</span>
+      </div>
+      <button id="btnLogout" class="btn-logout" type="button" title="로그아웃">로그아웃</button>
+    </div>
+
     <div class="header">
       <span class="badge">✨ AI 감정일기</span>
       <!-- 1. 제목 -->
@@ -444,6 +755,19 @@
   </div>
 
   <script>
+    // 인증 관련 DOM 요소
+    const authContainer = document.getElementById('authContainer');
+    const diaryContainer = document.getElementById('diaryContainer');
+    const authEmail = document.getElementById('authEmail');
+    const authPassword = document.getElementById('authPassword');
+    const btnLogin = document.getElementById('btnLogin');
+    const btnSignup = document.getElementById('btnSignup');
+    const btnGoogleLogin = document.getElementById('btnGoogleLogin');
+    const authMessage = document.getElementById('authMessage');
+    const userEmailDisplay = document.getElementById('userEmailDisplay');
+    const btnLogout = document.getElementById('btnLogout');
+
+    // 일기장 관련 DOM 요소
     const diaryInput = document.getElementById('diaryInput');
     const btnVoice = document.getElementById('btnVoice');
     const btnAnalyze = document.getElementById('btnAnalyze');
@@ -451,6 +775,546 @@
     const historyList = document.getElementById('historyList');
     const historyCount = document.getElementById('historyCount');
     const btnRefreshHistory = document.getElementById('btnRefreshHistory');
+
+    // 💡 API 베이스 URL (file:/// 로 열었을 경우 자동으로 localhost:3000 연동)
+    const API_BASE_URL = window.location.protocol.startsWith('http') ? '' : 'http://localhost:3000';
+
+    // --- Supabase 클라이언트 설정 및 초기화 ---
+    // 💡 CDN에서 로드된 window.supabase 객체를 백업하고, var를 사용하여 식별자 중복 선언(SyntaxError)을 방지합니다.
+    const supabaseSDK = window.supabase;
+    var supabase = null;
+    var isSupabaseConnected = false;
+
+    // 💡 Supabase 프로젝트 설정 (실제 확인 이메일을 받으려면 본인의 Supabase URL과 Key를 입력하세요)
+    const SUPABASE_CONFIG = {
+      url: 'https://kxlebrmrcxngqylgkynj.supabase.co' ,       // 예: 'https://your-project.supabase.co'
+      anonKey:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt4bGVicm1yY3huZ3F5bGdreW5qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkxODM1MDUsImV4cCI6MjEwNDc1OTUwNX0.PG13MD6G2l0N39NRhHk8aY3qkl9hL_Xjngjd7TgLic0' // 예: 'eyJhbGciOiJIUzI1NiIsIn...'
+    };
+
+    async function initSupabase() {
+      let supabaseUrl = SUPABASE_CONFIG.url;
+      let supabaseAnonKey = SUPABASE_CONFIG.anonKey;
+
+      // 1. 설정값이 없을 경우 서버 /api/config로부터 환경변수 조회 시도
+      if (!supabaseUrl || !supabaseAnonKey) {
+        try {
+          const res = await fetch(`${API_BASE_URL}/api/config`);
+          if (res.ok) {
+            const config = await res.json();
+            if (config.supabaseUrl && config.supabaseAnonKey) {
+              supabaseUrl = config.supabaseUrl;
+              supabaseAnonKey = config.supabaseAnonKey;
+            }
+          }
+        } catch (e) {
+          console.warn('[Supabase] /api/config 조회 실패:', e);
+        }
+      }
+
+      // 2. Supabase SDK 및 유효한 URL/키가 있는 경우 공식 클라이언트 생성
+      if (supabaseSDK && supabaseUrl && supabaseAnonKey && supabaseUrl !== '[SENSITIVE]' && supabaseUrl.startsWith('http')) {
+        try {
+          supabase = supabaseSDK.createClient(supabaseUrl, supabaseAnonKey);
+          isSupabaseConnected = true;
+          console.log('✨ Supabase 공식 클라이언트가 성공적으로 연결되었습니다.');
+        } catch (err) {
+          console.warn('Supabase createClient 오류:', err);
+        }
+      }
+
+      // 3. 환경변수/키 미설정 또는 file:/// 직접 실행 시에도 에러 없이 동작하도록 Fallback 클라이언트 제공
+      if (!supabase) {
+        isSupabaseConnected = false;
+        supabase = {
+          auth: {
+            signUp: async ({ email, password }) => {
+              console.log('[Supabase Demo Client] signUp 호출:', email);
+              saveUser(email, password);
+              return {
+                data: {
+                  user: {
+                    id: 'demo-' + Date.now(),
+                    email: email,
+                    confirmed_at: null
+                  },
+                  session: null
+                },
+                error: null
+              };
+            },
+            signInWithPassword: async ({ email, password }) => {
+              console.log('[Supabase Demo Client] signInWithPassword 호출:', email);
+              const users = getRegisteredUsers();
+              const user = users[email.toLowerCase()];
+              if (user) {
+                if (user.password === password) {
+                  return {
+                    data: { user: { id: 'demo-' + Date.now(), email: email }, session: { user: { email: email } } },
+                    error: null
+                  };
+                } else {
+                  return { data: { user: null, session: null }, error: { message: '비밀번호가 일치하지 않습니다.' } };
+                }
+              }
+              // 신규 계정일 경우 자동 등록 후 로그인 지원
+              saveUser(email, password);
+              return {
+                data: { user: { id: 'demo-' + Date.now(), email: email }, session: { user: { email: email } } },
+                error: null
+              };
+            },
+            signInWithOAuth: async ({ provider }) => {
+              console.log('[Supabase Demo Client] signInWithOAuth 호출:', provider);
+              const demoUser = {
+                id: 'demo-google-' + Date.now(),
+                email: 'google.user@gmail.com',
+                provider: provider || 'google',
+                loggedInAt: new Date().toISOString()
+              };
+              saveAuthSession(demoUser);
+              return { data: { provider, url: null }, error: null };
+            },
+            signOut: async () => {
+              console.log('[Supabase Demo Client] signOut 호출');
+              removeAuthSession();
+              return { error: null };
+            },
+            getSession: async () => {
+              const sessionUser = getAuthSession();
+              if (sessionUser && sessionUser.email) {
+                return { data: { session: { user: sessionUser } }, error: null };
+              }
+              return { data: { session: null }, error: null };
+            },
+            getUser: async () => {
+              const sessionUser = getAuthSession();
+              if (sessionUser && sessionUser.email) {
+                return { data: { user: sessionUser }, error: null };
+              }
+              return { data: { user: null }, error: null };
+            },
+            onAuthStateChange: (callback) => {
+              return { data: { subscription: { unsubscribe: () => {} } } };
+            }
+          }
+        };
+      }
+    }
+
+    // --- 인증(Auth) 상태 관리 로직 ---
+    const AUTH_SESSION_KEY = 'emotionDiary_auth_session';
+    const AUTH_USERS_KEY = 'emotionDiary_auth_users';
+
+    // 현재 세션 조회
+    function getAuthSession() {
+      try {
+        const session = localStorage.getItem(AUTH_SESSION_KEY);
+        return session ? JSON.parse(session) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // 세션 저장
+    function saveAuthSession(user) {
+      try {
+        localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(user));
+      } catch (e) {
+        console.warn('세션 저장 실패:', e);
+      }
+    }
+
+    // 세션 삭제
+    function removeAuthSession() {
+      try {
+        localStorage.removeItem(AUTH_SESSION_KEY);
+      } catch (e) {
+        console.warn('세션 삭제 실패:', e);
+      }
+    }
+
+    // 과거 공용 캐시 및 타인 일기 캐시 완전 정리 함수
+    function cleanupLegacyHistoryCaches(currentUserId) {
+      try {
+        localStorage.removeItem('emotionDiary_history');
+        localStorage.removeItem('emotionDiary_history_default');
+        localStorage.removeItem('emotionDiary_text');
+        localStorage.removeItem('emotionDiary_aiReply');
+
+        // localStorage 내 모든 emotionDiary_history_* 및 draft 키 점검 및 타인 데이터 영구 삭제
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const key = localStorage.key(i);
+          if (key && key.startsWith('emotionDiary_history_')) {
+            try {
+              const raw = localStorage.getItem(key);
+              if (raw) {
+                const arr = JSON.parse(raw);
+                if (Array.isArray(arr)) {
+                  const filtered = currentUserId
+                    ? arr.filter(item => item && item.userId === currentUserId)
+                    : [];
+                  if (filtered.length > 0) {
+                    localStorage.setItem(key, JSON.stringify(filtered));
+                  } else {
+                    keysToRemove.push(key);
+                  }
+                }
+              }
+            } catch (e) {}
+          } else if (key && (key.startsWith('emotionDiary_text_') || key.startsWith('emotionDiary_aiReply_'))) {
+            // 현재 로그인 사용자의 임시 저장이 아니면 정리
+            if (!currentUserId || !key.endsWith(`_${currentUserId}`)) {
+              keysToRemove.push(key);
+            }
+          }
+        }
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+      } catch (err) {
+        console.warn('캐시 정리 중 오류:', err);
+      }
+    }
+
+    // 현재 사용자 전용 임시 작성 내용 및 AI 답변 복원 함수
+    function restoreUserDraft(currentUserId) {
+      try {
+        if (!currentUserId) {
+          diaryInput.value = '';
+          aiResponse.classList.remove('has-content');
+          aiResponse.textContent = '여기에 AI답변이 표시됩니다.';
+          return;
+        }
+
+        const savedText = localStorage.getItem(`emotionDiary_text_${currentUserId}`);
+        const savedAiReply = localStorage.getItem(`emotionDiary_aiReply_${currentUserId}`);
+
+        diaryInput.value = savedText || '';
+        if (savedAiReply) {
+          aiResponse.classList.add('has-content');
+          aiResponse.textContent = savedAiReply;
+        } else {
+          aiResponse.classList.remove('has-content');
+          aiResponse.textContent = '여기에 AI답변이 표시됩니다.';
+        }
+      } catch (e) {
+        console.warn('사용자 임시 입력 복원 실패:', e);
+      }
+    }
+
+    // 세션 토큰(access_token) 가져오기 헬퍼
+    async function getAuthToken() {
+      try {
+        if (supabase && supabase.auth && supabase.auth.getSession) {
+          const { data } = await supabase.auth.getSession();
+          if (data && data.session && data.session.access_token) {
+            return data.session.access_token;
+          }
+        }
+      } catch (e) {
+        console.warn('Supabase 세션 토큰 가져오기 실패:', e);
+      }
+
+      // 로컬 세션 캐시 폴백 (오프라인/로컬 테스트 지원)
+      const sessionUser = getAuthSession();
+      if (sessionUser && sessionUser.id) {
+        return `demo-${sessionUser.id}`;
+      } else if (sessionUser && sessionUser.email) {
+        const safeEmail = sessionUser.email.replace(/[^a-zA-Z0-9]/g, '_');
+        return `demo-${safeEmail}`;
+      }
+      return null;
+    }
+
+    // 가입된 계정 목록 조회
+    function getRegisteredUsers() {
+      try {
+        const users = localStorage.getItem(AUTH_USERS_KEY);
+        return users ? JSON.parse(users) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    // 계정 저장
+    function saveUser(email, password) {
+      try {
+        const users = getRegisteredUsers();
+        users[email.toLowerCase()] = {
+          email: email,
+          password: password,
+          createdAt: new Date().toISOString()
+        };
+        localStorage.setItem(AUTH_USERS_KEY, JSON.stringify(users));
+      } catch (e) {
+        console.warn('유저 저장 실패:', e);
+      }
+    }
+
+    // 인증 안내 메시지 표시
+    function showAuthMessage(msg, type = 'error') {
+      authMessage.textContent = msg;
+      authMessage.className = `auth-message ${type}`;
+      authMessage.style.display = 'block';
+    }
+
+    // 인증 안내 메시지 숨기기
+    function clearAuthMessage() {
+      authMessage.textContent = '';
+      authMessage.style.display = 'none';
+      authMessage.className = 'auth-message';
+    }
+
+    // 화면 전환: 로그인 화면 표시 (로그인 안 된 사용자)
+    function showAuthView() {
+      authContainer.style.display = 'block';
+      diaryContainer.style.display = 'none';
+      authPassword.value = '';
+      clearAuthMessage();
+    }
+
+    // 화면 전환: 일기장 화면 표시 (로그인 완료된 사용자)
+    function showDiaryView(user) {
+      authContainer.style.display = 'none';
+      diaryContainer.style.display = 'block';
+      userEmailDisplay.textContent = user.email || '사용자';
+      cleanupLegacyHistoryCaches(user.id);
+      restoreUserDraft(user.id);
+      loadDiaryHistory();
+    }
+
+    // 이메일 유효성 검사
+    function validateEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    // 로그인 실행 (Supabase.auth.signInWithPassword 연동)
+    async function handleLogin() {
+      clearAuthMessage();
+      const email = authEmail.value.trim();
+      const password = authPassword.value;
+
+      if (!email) {
+        showAuthMessage('이메일을 입력해 주세요.', 'error');
+        authEmail.focus();
+        return;
+      }
+      if (!validateEmail(email)) {
+        showAuthMessage('올바른 이메일 형식을 입력해 주세요.', 'error');
+        authEmail.focus();
+        return;
+      }
+      if (!password) {
+        showAuthMessage('비밀번호를 입력해 주세요.', 'error');
+        authPassword.focus();
+        return;
+      }
+
+      btnLogin.disabled = true;
+      btnLogin.style.opacity = '0.7';
+      showAuthMessage('로그인 중입니다...', 'success');
+
+      try {
+        if (!supabase) {
+          await initSupabase();
+        }
+
+        // 1. supabase.auth.signInWithPassword 함수를 사용해 로그인 시도
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+        if (error) {
+          let errMsg = error.message;
+          if (errMsg.includes('Invalid login credentials')) {
+            errMsg = '이메일 또는 비밀번호가 올바르지 않습니다.';
+          } else if (errMsg.includes('Email not confirmed')) {
+            errMsg = '이메일 인증이 완료되지 않았습니다. 메일함의 가입확인 이메일을 확인해 주세요.';
+          }
+          showAuthMessage(`로그인 실패: ${errMsg}`, 'error');
+          return;
+        }
+
+        // 2. 로그인 성공 시 로그인 폼을 숨기고 기존 일기장 화면을 보여줌 (상단 이메일 및 로그아웃 버튼 표시)
+        const user = data.user || { email: email };
+        const sessionUser = {
+          email: user.email || email,
+          id: user.id || null,
+          loggedInAt: new Date().toISOString()
+        };
+        saveAuthSession(sessionUser);
+
+        showAuthMessage('로그인에 성공했습니다!', 'success');
+        setTimeout(() => {
+          showDiaryView(sessionUser);
+        }, 200);
+
+      } catch (err) {
+        console.error('Login error:', err);
+        showAuthMessage(`로그인 중 오류가 발생했습니다: ${err.message}`, 'error');
+      } finally {
+        btnLogin.disabled = false;
+        btnLogin.style.opacity = '1';
+      }
+    }
+
+    // 회원가입 실행 (Supabase.auth.signUp 연동)
+    async function handleSignup() {
+      clearAuthMessage();
+      const email = authEmail.value.trim();
+      const password = authPassword.value;
+
+      if (!email) {
+        showAuthMessage('이메일을 입력해 주세요.', 'error');
+        authEmail.focus();
+        return;
+      }
+      if (!validateEmail(email)) {
+        showAuthMessage('올바른 이메일 형식을 입력해 주세요.', 'error');
+        authEmail.focus();
+        return;
+      }
+      if (!password) {
+        showAuthMessage('비밀번호를 입력해 주세요.', 'error');
+        authPassword.focus();
+        return;
+      }
+      if (password.length < 6) {
+        showAuthMessage('비밀번호는 최소 6자 이상이어야 합니다.', 'error');
+        authPassword.focus();
+        return;
+      }
+
+      btnSignup.disabled = true;
+      btnSignup.style.opacity = '0.7';
+      showAuthMessage('회원가입 요청 중입니다...', 'success');
+
+      try {
+        if (!supabase) {
+          await initSupabase();
+        }
+
+        // Supabase 클라이언트를 사용해서 새로운 사용자 등록
+        const { data, error } = await supabase.auth.signUp({
+          email: email,
+          password: password
+        });
+
+        if (error) {
+          showAuthMessage(`회원가입 실패: ${error.message}`, 'error');
+          return;
+        }
+
+        // 회원가입 성공 시 사용자에게 '가입확인 이메일을 확인해 주세요' 메시지 표시
+        authPassword.value = '';
+
+        if (isSupabaseConnected) {
+          showAuthMessage('가입확인 이메일을 확인해 주세요 (스팸 메일함도 함께 확인해 주세요)', 'success');
+          alert('가입확인 이메일을 확인해 주세요!\nSupabase에서 확인 메일을 발송했습니다.\n(메일이 보이지 않으면 스팸 메일함도 확인해 주세요)');
+        } else {
+          showAuthMessage('가입확인 이메일을 확인해 주세요\n(💡 알림: 현재 Supabase 프로젝트 키가 설정되지 않아 실제 메일은 발송되지 않는 테스트 모드입니다. 실제 메일을 받으시려면 index.html의 SUPABASE_CONFIG 또는 .env에 Supabase URL/Key를 입력해 주세요)', 'success');
+          alert('가입확인 이메일을 확인해 주세요\n\n[안내] 현재 Supabase 프로젝트 키가 등록되지 않아 실제 메일함으로는 발송되지 않는 로컬 테스트 모드입니다.\n실제 인증 메일을 수신하시려면 Supabase 대시보드의 URL과 Key를 설정해 주세요.');
+        }
+      } catch (err) {
+        console.error('Signup error:', err);
+        showAuthMessage(`회원가입 중 오류가 발생했습니다: ${err.message}`, 'error');
+      } finally {
+        btnSignup.disabled = false;
+        btnSignup.style.opacity = '1';
+      }
+    }
+
+    // Google 로그인 실행 (Supabase.auth.signInWithOAuth 연동)
+    async function handleGoogleLogin() {
+      clearAuthMessage();
+      btnGoogleLogin.disabled = true;
+      btnGoogleLogin.style.opacity = '0.7';
+      showAuthMessage('Google 로그인 페이지로 연결 중...', 'success');
+
+      try {
+        if (!supabase) {
+          await initSupabase();
+        }
+
+        // 로그인 완료 후 복귀할 리다이렉트 URL 설정
+        const redirectTo = window.location.protocol.startsWith('http')
+          ? window.location.origin + window.location.pathname
+          : 'http://localhost:3000';
+
+        // Supabase를 통해 Google 계정으로 로그인 (provider: 'google')
+        const { data, error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: redirectTo
+          }
+        });
+
+        if (error) {
+          showAuthMessage(`Google 로그인 실패: ${error.message}`, 'error');
+          return;
+        }
+
+        // Fallback 모드(URL 리다이렉트가 없는 로컬 테스트)일 경우 일기장 화면 전환
+        if (!data || !data.url) {
+          const sessionUser = getAuthSession() || { email: 'google.user@gmail.com', provider: 'google' };
+          showDiaryView(sessionUser);
+        }
+
+      } catch (err) {
+        console.error('Google OAuth error:', err);
+        showAuthMessage(`Google 로그인 중 오류가 발생했습니다: ${err.message}`, 'error');
+      } finally {
+        btnGoogleLogin.disabled = false;
+        btnGoogleLogin.style.opacity = '1';
+      }
+    }
+
+    // 로그아웃 실행 (Supabase.auth.signOut 연동)
+    async function handleLogout() {
+      if (!confirm('로그아웃 하시겠습니까?')) {
+        return;
+      }
+
+      try {
+        if (!supabase) {
+          await initSupabase();
+        }
+
+        // 4. supabase.auth.signOut 함수를 사용하여 로그아웃 처리
+        if (supabase && supabase.auth && supabase.auth.signOut) {
+          await supabase.auth.signOut();
+        }
+      } catch (err) {
+        console.warn('Supabase signOut 호출 중 오류:', err);
+      } finally {
+        // 로컬 세션 삭제 및 캐시 정리 후 다시 로그인 폼 보여주기
+        removeAuthSession();
+        cleanupLegacyHistoryCaches(null);
+        restoreUserDraft(null);
+        showAuthView();
+      }
+    }
+
+    // 이벤트 리스너 바인딩
+    btnLogin.addEventListener('click', handleLogin);
+    btnSignup.addEventListener('click', handleSignup);
+    btnGoogleLogin.addEventListener('click', handleGoogleLogin);
+    btnLogout.addEventListener('click', handleLogout);
+
+    // Enter 키로 편리한 로그인 지원
+    authEmail.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        authPassword.focus();
+      }
+    });
+
+    authPassword.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        handleLogin();
+      }
+    });
 
     // 음성 인식 (Web Speech API) 기능 연결
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -539,15 +1403,28 @@
       aiResponse.textContent = 'Gemini AI가 당신의 일기를 읽고 분석하는 중입니다... 💭✨';
 
       try {
-        const response = await fetch('/api/analyze', {
+        const token = await getAuthToken();
+        const requestHeaders = {
+          'Content-Type': 'application/json'
+        };
+        if (token) {
+          requestHeaders['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(`${API_BASE_URL}/api/analyze`, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
+          headers: requestHeaders,
           body: JSON.stringify({ diaryText: text })
         });
 
-        const data = await response.json();
+        let data;
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          data = await response.json();
+        } else {
+          const raw = await response.text();
+          throw new Error(raw || '서버 응답 오류');
+        }
 
         if (!response.ok) {
           throw new Error(data.error || '분석 중 오류가 발생했습니다.');
@@ -556,10 +1433,29 @@
         aiResponse.classList.add('has-content');
         aiResponse.textContent = data.reply;
 
-        // 로컬 스토리지에 최신 데이터 임시 캐시
+        // 로컬 스토리지에 최신 데이터 임시 캐시 및 사용자 전용 히스토리 보존
         try {
-          localStorage.setItem('emotionDiary_text', text);
-          localStorage.setItem('emotionDiary_aiReply', data.reply);
+          const currentSession = getAuthSession();
+          const currentUserId = currentSession?.id;
+
+          // 사용자 전용 키로 임시 보존 (타인 노출 원천 차단)
+          if (currentUserId) {
+            localStorage.setItem(`emotionDiary_text_${currentUserId}`, text);
+            localStorage.setItem(`emotionDiary_aiReply_${currentUserId}`, data.reply);
+          }
+          localStorage.removeItem('emotionDiary_text');
+          localStorage.removeItem('emotionDiary_aiReply');
+
+          const userCacheKey = 'emotionDiary_history_' + (currentUserId || (currentSession?.email ? currentSession.email.replace(/[^a-zA-Z0-9]/g, '_') : 'default'));
+          const localHistory = JSON.parse(localStorage.getItem(userCacheKey) || '[]');
+          localHistory.unshift({
+            id: data.diaryId || ('diary-' + Date.now()),
+            userId: currentUserId || null,
+            diaryText: text,
+            aiReply: data.reply,
+            createdAt: new Date().toISOString()
+          });
+          localStorage.setItem(userCacheKey, JSON.stringify(localHistory.slice(0, 50)));
         } catch (storageErr) {
           console.warn('로컬 스토리지 저장 실패:', storageErr);
         }
@@ -626,19 +1522,71 @@
       return { text: '감정 분석', className: '' };
     }
 
-    // Serverless Redis로부터 일기 히스토리 불러오기
+    // Serverless Redis로부터 일기 히스토리 불러오기 (현재 로그인한 사용자 전용)
     async function loadDiaryHistory() {
       try {
-        const res = await fetch('/api/history', {
+        const token = await getAuthToken();
+        const requestHeaders = {};
+        if (token) {
+          requestHeaders['Authorization'] = `Bearer ${token}`;
+        }
+
+        const res = await fetch(`${API_BASE_URL}/api/history`, {
+          headers: requestHeaders,
           cache: 'no-store'
         });
-        const data = await res.json();
+
+        let data;
+        const contentType = res.headers.get('content-type') || '';
+
+        if (contentType.includes('application/json')) {
+          data = await res.json();
+        } else {
+          const rawText = await res.text();
+          if (rawText.includes('Forbidden') || res.status === 403) {
+            throw new Error(`백엔드 접근 권한이 없습니다 (403 Forbidden). 브라우저 주소창에 http://localhost:3000 으로 접속해 주세요.`);
+          }
+          try {
+            data = JSON.parse(rawText);
+          } catch {
+            throw new Error(rawText ? rawText.slice(0, 100) : '히스토리 데이터 파싱 실패');
+          }
+        }
+
+        if (res.status === 401) {
+          throw new Error('로그인 인증이 만료되었거나 올바르지 않습니다. 다시 로그인해 주세요.');
+        }
 
         if (!res.ok || !data.success) {
           throw new Error(data.error || '히스토리를 불러오지 못했습니다.');
         }
 
-        const list = data.diaries || [];
+        let list = data.diaries || [];
+
+        // 현재 사용자 전용 로컬 캐시 동기화 (오프라인 폴백용)
+        const currentSession = getAuthSession();
+        const currentUserId = currentSession?.id;
+        const userCacheKey = 'emotionDiary_history_' + (currentUserId || (currentSession?.email ? currentSession.email.replace(/[^a-zA-Z0-9]/g, '_') : 'default'));
+
+        // 클라이언트 사이드 추가 격리 검증: 본인 userId와 일치하는 일기만 통과
+        if (currentUserId) {
+          list = list.filter(item => item && item.userId === currentUserId);
+        }
+
+        try {
+          // 백엔드에서 인증된 사용자 데이터만 정확히 캐시
+          localStorage.setItem(userCacheKey, JSON.stringify(list.slice(0, 50)));
+          // 예전 버전의 공용 캐시가 남아있다면 제거하여 데이터 오염 방지
+          localStorage.removeItem('emotionDiary_history');
+        } catch (e) {}
+
+        // 최신순 정렬
+        list.sort((a, b) => {
+          const keyA = a.id || a.createdAt || '';
+          const keyB = b.id || b.createdAt || '';
+          return keyB.localeCompare(keyA);
+        });
+
         historyCount.textContent = list.length;
 
         if (list.length === 0) {
@@ -651,52 +1599,81 @@
           return;
         }
 
-        // 각 항목을 최신순 카드 형태로 렌더링
-        historyList.innerHTML = list.map(item => {
-          const dateStr = formatDate(item.id, item.createdAt);
-          const emotionInfo = extractEmotion(item.aiReply);
-          const diaryText = (item.diaryText || '').trim();
-          const aiReply = (item.aiReply || '').trim();
-
-          return `
-            <div class="history-card">
-              <div class="card-top">
-                <div class="card-date">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <polyline points="12 6 12 12 16 14"></polyline>
-                  </svg>
-                  ${dateStr}
-                </div>
-                <span class="emotion-tag ${emotionInfo.className}">
-                  ✨ ${emotionInfo.text}
-                </span>
-              </div>
-              <div class="card-diary-content">${escapeHtml(diaryText)}</div>
-              ${aiReply ? `
-                <div class="card-ai-bubble">
-                  <div class="card-ai-label">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                    AI 상담가의 답장
-                  </div>
-                  <div>${escapeHtml(aiReply)}</div>
-                </div>
-              ` : ''}
-            </div>
-          `;
-        }).join('');
+        renderHistoryCards(list);
 
       } catch (err) {
         console.error('History load error:', err);
+
+        // 서버 로드 실패 시 사용자 전용 로컬스토리지 히스토리 폴백 렌더링
+        const currentSession = getAuthSession();
+        const currentUserId = currentSession?.id;
+        const userCacheKey = 'emotionDiary_history_' + (currentUserId || (currentSession?.email ? currentSession.email.replace(/[^a-zA-Z0-9]/g, '_') : 'default'));
+        let localList = [];
+        try {
+          localList = JSON.parse(localStorage.getItem(userCacheKey) || '[]');
+          if (currentUserId && Array.isArray(localList)) {
+            localList = localList.filter(item => item && item.userId === currentUserId);
+          }
+        } catch (e) {}
+
+        if (localList.length > 0) {
+          historyCount.textContent = localList.length;
+          renderHistoryCards(localList);
+          return;
+        }
+
+        let errorTip = '';
+        if (window.location.protocol === 'file:') {
+          errorTip = '<br><span style="color:#4f46e5;font-weight:600;font-size:12px;">💡 브라우저 주소창에 <b>http://localhost:3000</b> 으로 접속하시면 로컬 서버 API와 완벽히 통신할 수 있습니다!</span>';
+        }
+
         historyList.innerHTML = `
           <div class="error-history">
             ⚠️ 히스토리를 불러오는 중 오류가 발생했습니다.<br>
             <small style="color:#ef4444;">${escapeHtml(err.message)}</small>
+            ${errorTip}
           </div>
         `;
       }
+    }
+
+    // 일기 카드 목록 렌더링 함수
+    function renderHistoryCards(list) {
+      historyList.innerHTML = list.map(item => {
+        const dateStr = formatDate(item.id, item.createdAt);
+        const emotionInfo = extractEmotion(item.aiReply);
+        const diaryText = (item.diaryText || '').trim();
+        const aiReply = (item.aiReply || '').trim();
+
+        return `
+          <div class="history-card">
+            <div class="card-top">
+              <div class="card-date">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                ${dateStr}
+              </div>
+              <span class="emotion-tag ${emotionInfo.className}">
+                ✨ ${emotionInfo.text}
+              </span>
+            </div>
+            <div class="card-diary-content">${escapeHtml(diaryText)}</div>
+            ${aiReply ? `
+              <div class="card-ai-bubble">
+                <div class="card-ai-label">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                  AI 상담가의 답장
+                </div>
+                <div>${escapeHtml(aiReply)}</div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
     }
 
     // HTML 태그 XSS 이스케이프 함수
@@ -710,9 +1687,11 @@
         .replace(/'/g, '&#039;');
     }
 
-    // 새로고침 버튼 이벤트
+    // 새로고침 버튼 이벤트: 캐시 정리 및 재조회
     btnRefreshHistory.addEventListener('click', () => {
       btnRefreshHistory.style.transform = 'rotate(180deg)';
+      const currentSession = getAuthSession();
+      cleanupLegacyHistoryCaches(currentSession?.id);
       loadDiaryHistory().finally(() => {
         setTimeout(() => {
           btnRefreshHistory.style.transform = 'rotate(0deg)';
@@ -720,25 +1699,61 @@
       });
     });
 
-    // 페이지 로드 시 로컬스토리지 복원 및 히스토리 자동 조회 실행
-    function init() {
-      try {
-        const savedText = localStorage.getItem('emotionDiary_text');
-        const savedAiReply = localStorage.getItem('emotionDiary_aiReply');
+    // 페이지 로드 시 초기화: Supabase 세션 및 로그인 상태 확인 후 화면 분기
+    async function init() {
+      // 1. Supabase 클라이언트 초기화
+      await initSupabase();
 
-        if (savedText) {
-          diaryInput.value = savedText;
+      // 2. 과거 공통 캐시 및 타인 일기/답변 즉시 청소
+      cleanupLegacyHistoryCaches(null);
+
+      // 3. 페이지가 처음 로드될 때도 현재 로그인 상태 확인
+      let currentUser = null;
+
+      try {
+        if (supabase && supabase.auth && supabase.auth.getSession) {
+          const { data, error } = await supabase.auth.getSession();
+          if (!error && data && data.session && data.session.user) {
+            currentUser = {
+              email: data.session.user.email,
+              id: data.session.user.id
+            };
+          }
         }
-        if (savedAiReply) {
-          aiResponse.classList.add('has-content');
-          aiResponse.textContent = savedAiReply;
-        }
-      } catch (e) {
-        console.warn('로컬 스토리지 복원 실패:', e);
+      } catch (err) {
+        console.warn('Supabase 세션 확인 오류:', err);
       }
 
-      // 페이지 로드 시 히스토리 자동 로드
-      loadDiaryHistory();
+      // Supabase 세션이 없다면 로컬 세션 캐시 확인
+      if (!currentUser) {
+        currentUser = getAuthSession();
+      }
+
+      // 이미 로그인 상태라면 바로 일기장 화면을 보여줌
+      if (currentUser && currentUser.email) {
+        saveAuthSession(currentUser);
+        cleanupLegacyHistoryCaches(currentUser.id);
+        showDiaryView(currentUser);
+      } else {
+        cleanupLegacyHistoryCaches(null);
+        showAuthView();
+      }
+
+      // Supabase 세션 변경 감지 리스너 연결
+      try {
+        if (supabase && supabase.auth && supabase.auth.onAuthStateChange) {
+          supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' && session && session.user) {
+              const u = { email: session.user.email, id: session.user.id };
+              saveAuthSession(u);
+              showDiaryView(u);
+            } else if (event === 'SIGNED_OUT') {
+              removeAuthSession();
+              showAuthView();
+            }
+          });
+        }
+      } catch (e) {}
     }
 
     init();

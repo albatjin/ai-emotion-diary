@@ -4,6 +4,7 @@
 const fs = require('fs');
 const path = require('path');
 const Redis = require('ioredis');
+const { verifyAuthToken } = require('../lib/supabase');
 
 // 환경변수 로더 (Vercel 환경 및 로컬 .env.* 지원)
 function getEnvValue(key) {
@@ -90,24 +91,43 @@ function generateDiaryId() {
   return `diary-${year}${month}${day}${hours}${minutes}${seconds}`;
 }
 
-// Serverless Redis에 일기 데이터 묶음 저장
+// Serverless Redis에 일기 데이터 묶음 저장 (Redis 미설정 시 로컬 파일 data/diaries.json에 자동 저장)
 async function saveDiaryToRedis(diaryId, diaryData) {
   const client = getRedisClient();
-  if (!client) {
-    console.warn('[Redis] REDIS_URL 환경변수가 설정되지 않아 저장을 건너뜁니다.');
-    return { success: false, reason: 'REDIS_URL_NOT_CONFIGURED' };
+  if (client) {
+    try {
+      if (client.status === 'wait') {
+        await client.connect();
+      }
+      await client.set(diaryId, JSON.stringify(diaryData));
+      console.log(`[Redis] 일기 데이터가 성공적으로 저장되었습니다. Key: ${diaryId}`);
+      return { success: true, storage: 'redis' };
+    } catch (err) {
+      console.error('[Redis Error] 데이터 저장 중 오류 발생:', err.message);
+    }
   }
 
+  // Redis 미설정 또는 오류 시 로컬 파일(data/diaries.json)에 영구 저장
   try {
-    if (client.status === 'wait') {
-      await client.connect();
+    const dataDir = path.join(process.cwd(), 'data');
+    if (!fs.existsSync(dataDir)) {
+      fs.mkdirSync(dataDir, { recursive: true });
     }
-    await client.set(diaryId, JSON.stringify(diaryData));
-    console.log(`[Redis] 일기 데이터가 성공적으로 저장되었습니다. Key: ${diaryId}`);
-    return { success: true };
-  } catch (err) {
-    console.error('[Redis Error] 데이터 저장 중 오류 발생:', err.message);
-    return { success: false, reason: err.message };
+    const filePath = path.join(dataDir, 'diaries.json');
+    let diaries = [];
+    if (fs.existsSync(filePath)) {
+      try {
+        diaries = JSON.parse(fs.readFileSync(filePath, 'utf8')) || [];
+      } catch {}
+    }
+    // 최신 일기를 맨 앞에 추가
+    diaries.unshift(diaryData);
+    fs.writeFileSync(filePath, JSON.stringify(diaries, null, 2), 'utf8');
+    console.log(`[Local File] 일기 데이터가 data/diaries.json에 안전하게 저장되었습니다. Key: ${diaryId}`);
+    return { success: true, storage: 'local_file' };
+  } catch (fileErr) {
+    console.error('[Local File Error] 로컬 파일 저장 실패:', fileErr.message);
+    return { success: false, reason: fileErr.message };
   }
 }
 
@@ -131,6 +151,17 @@ module.exports = async function handler(req, res) {
       error: '허용되지 않는 요청 메서드입니다. POST 방식을 사용해주세요.'
     });
   }
+
+  // 4. 인증 토큰 검증 (요청 헤더의 Authorization Bearer 토큰)
+  const authHeader = req.headers.authorization || req.headers.Authorization;
+  const authResult = await verifyAuthToken(authHeader);
+  if (!authResult.success) {
+    return res.status(401).json({
+      success: false,
+      error: authResult.error || '인증이 필요합니다. 로그인 후 다시 시도해주세요.'
+    });
+  }
+  const userId = authResult.userId;
 
   try {
     // 4. 요청 본문 파싱 및 입력값 유효성 검사
@@ -238,17 +269,20 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // 7. 현재 시간을 기준으로 고유 ID 생성 및 Serverless Redis에 일기 묶음 데이터 저장
+    // 7. 사용자 ID를 포함한 고유 키 생성 및 Serverless Redis에 일기 데이터 저장
     const diaryId = generateDiaryId();
+    const redisKey = `user:${userId}:${diaryId}`;
     const createdAt = new Date().toISOString();
     const diaryData = {
       id: diaryId,
+      key: redisKey,
+      userId: userId,
       diaryText: diaryText,
       aiReply: reply,
       createdAt: createdAt
     };
 
-    const redisResult = await saveDiaryToRedis(diaryId, diaryData);
+    const redisResult = await saveDiaryToRedis(redisKey, diaryData);
 
     // 8. 성공 결과 반환 (프론트엔드 호환을 위해 reply 필드 유지 + 고유 ID 및 Redis 저장 상태 포함)
     return res.status(200).json({

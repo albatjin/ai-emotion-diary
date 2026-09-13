@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const analyzeHandler = require('./api/analyze');
 const historyHandler = require('./api/history');
+const configHandler = require('./api/config');
 
 const PORT = process.env.PORT || 3000;
 const MIME_TYPES = {
@@ -15,6 +16,17 @@ const MIME_TYPES = {
 
 // HTTP 서버 생성 (로컬 개발용 정적 서빙 및 Vercel 서버리스 함수 모의 실행)
 const server = http.createServer(async (req, res) => {
+  // CORS 헤더 설정 (file:/// 브라우저 직접 접근 및 교차 출처 허용)
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   // Vercel Serverless Function 헬퍼 메서드 호환성 추가 (res.status, res.json)
   res.status = function (code) {
     this.statusCode = code;
@@ -25,6 +37,19 @@ const server = http.createServer(async (req, res) => {
     this.end(JSON.stringify(data));
     return this;
   };
+
+  // API 엔드포인트: /api/config -> Vercel 서버리스 함수(api/config.js) 위임
+  if (req.url === '/api/config') {
+    try {
+      await configHandler(req, res);
+    } catch (err) {
+      console.error('Config execution error:', err);
+      if (!res.headersSent) {
+        res.status(500).json({ error: err.message });
+      }
+    }
+    return;
+  }
 
   // API 엔드포인트: /api/analyze -> Vercel 서버리스 함수(api/analyze.js) 위임
   if (req.url === '/api/analyze') {
@@ -57,17 +82,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // CORS 프리플라이트 처리 (정적 자산 또는 기타 경로)
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-    res.writeHead(204);
-    res.end();
-    return;
-  }
-
-  // 정적 파일 서빙 (index.html 등)
+  // 정적 파일 서빙 (index.html 등) - 브라우저 캐시 방지
   let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
   const ext = path.extname(filePath).toLowerCase();
   const contentType = MIME_TYPES[ext] || 'application/octet-stream';
@@ -82,7 +97,12 @@ const server = http.createServer(async (req, res) => {
         res.end('500 Server Error');
       }
     } else {
-      res.writeHead(200, { 'Content-Type': contentType });
+      res.writeHead(200, {
+        'Content-Type': contentType,
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
       res.end(content);
     }
   });
