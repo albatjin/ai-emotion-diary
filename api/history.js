@@ -176,6 +176,8 @@ module.exports = async function handler(req, res) {
 
     // 6. MGET으로 모든 후보 일기 데이터 한 번에 병렬 조회
     const rawDataList = await client.mget(allCandidateKeys);
+    console.log('[History Debug] allCandidateKeys:', allCandidateKeys);
+    console.log('[History Debug] rawDataList:', rawDataList);
 
     const userDiaries = [];
     for (let i = 0; i < rawDataList.length; i++) {
