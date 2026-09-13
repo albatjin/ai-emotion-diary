@@ -616,6 +616,132 @@
       animation: pulse 2s infinite;
     }
 
+    /* 8-1. 실시간 채팅 프로필 섹션 스타일 */
+    .chat-profile-section {
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 1.5px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+
+    .chat-profile-avatar-wrap {
+      position: relative;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid #ffffff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15), 0 2px 4px rgba(0, 0, 0, 0.05);
+      background-color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+      overflow: visible;
+      user-select: none;
+    }
+
+    .chat-profile-avatar-wrap:hover {
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25);
+      border-color: #6366f1;
+    }
+
+    .chat-profile-avatar-wrap:focus-visible {
+      outline: 3px solid #818cf8;
+      outline-offset: 2px;
+    }
+
+    .chat-avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .chat-avatar-default {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+      color: #64748b;
+    }
+
+    .chat-avatar-hover-badge {
+      position: absolute;
+      right: -2px;
+      bottom: -2px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: #4f46e5;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #ffffff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .chat-profile-avatar-wrap:hover .chat-avatar-hover-badge {
+      transform: scale(1.12);
+      background-color: #4338ca;
+    }
+
+    .btn-change-photo {
+      background: transparent;
+      border: none;
+      color: #4f46e5;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 10px;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .btn-change-photo:hover {
+      color: #3730a3;
+      background-color: #eef2ff;
+      text-decoration: none;
+    }
+
+    .btn-change-photo:active {
+      transform: translateY(1px);
+    }
+
+    .profile-upload-status {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 2px;
+      text-align: center;
+    }
+
+    .profile-upload-status.success {
+      color: #059669;
+      font-weight: 500;
+    }
+
+    .profile-upload-status.error {
+      color: #dc2626;
+      font-weight: 500;
+    }
+
     .chat-messages-container {
       height: 320px;
       overflow-y: auto;
@@ -685,6 +811,48 @@
       word-break: break-all;
     }
 
+    /* 채팅 메시지 내 사용자 프로필 아바타 스타일 */
+    .chat-msg-avatar {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+      border: 1.5px solid #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      transition: all 0.2s ease;
+    }
+
+    .chat-bubble-wrapper.mine .chat-msg-avatar {
+      border-color: #a5b4fc;
+      background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    }
+
+    .chat-msg-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 50%;
+    }
+
+    .chat-msg-avatar-fallback {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+    }
+
+    .chat-bubble-wrapper.mine .chat-msg-avatar-fallback {
+      color: #4f46e5;
+    }
+
     .chat-bubble {
       padding: 10px 14px;
       border-radius: 16px;
@@ -718,13 +886,15 @@
 
     .chat-input-form {
       display: flex;
-      gap: 10px;
+      align-items: center;
+      gap: 8px;
       margin-top: 14px;
     }
 
     .chat-input {
       flex: 1;
-      padding: 13px 16px;
+      height: 48px;
+      padding: 0 16px;
       font-size: 14px;
       color: #1e293b;
       background-color: #f8fafc;
@@ -745,23 +915,47 @@
       color: #94a3b8;
     }
 
-    .btn-send-chat {
+    /* 채팅 액션 아이콘 버튼 공통 스타일 */
+    .btn-chat-icon {
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
-      padding: 13px 20px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #ffffff;
-      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-      border: none;
       border-radius: 14px;
+      border: none;
       cursor: pointer;
       transition: all 0.2s ease;
-      box-shadow: 0 3px 10px rgba(79, 70, 229, 0.25);
       font-family: inherit;
-      white-space: nowrap;
+      outline: none;
+      user-select: none;
+    }
+
+    /* 클립 모양 이미지 첨부 버튼 */
+    .btn-attach {
+      background-color: #f1f5f9;
+      color: #64748b;
+      border: 1.5px solid #e2e8f0;
+    }
+
+    .btn-attach:hover {
+      background-color: #eef2ff;
+      color: #4f46e5;
+      border-color: #c7d2fe;
+      transform: translateY(-1px);
+    }
+
+    .btn-attach:active {
+      transform: translateY(0);
+      background-color: #e0e7ff;
+    }
+
+    /* 전송 아이콘 버튼 */
+    .btn-send-chat {
+      color: #ffffff;
+      background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+      box-shadow: 0 3px 10px rgba(79, 70, 229, 0.25);
     }
 
     .btn-send-chat:hover {
@@ -772,6 +966,97 @@
 
     .btn-send-chat:active {
       transform: translateY(0);
+    }
+
+    .btn-send-chat:disabled,
+    .btn-attach:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* 8-2. 채팅 이미지 말풍선 스타일 */
+    .chat-bubble.has-image {
+      background: transparent !important;
+      padding: 0 !important;
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .chat-image-container {
+      position: relative;
+      max-width: 280px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1.5px solid #e2e8f0;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .chat-bubble-wrapper.mine .chat-image-container {
+      border-color: #c7d2fe;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.15);
+    }
+
+    .chat-image-container:hover {
+      transform: translateY(-2px) scale(1.015);
+      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
+    }
+
+    .chat-sent-image {
+      display: block;
+      width: 100%;
+      max-height: 280px;
+      object-fit: cover;
+      border-radius: 14px;
+      transition: opacity 0.2s ease;
+    }
+
+    /* 이미지 로드 실패 시 대체 UI */
+    .chat-image-fallback {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 22px 18px;
+      min-width: 210px;
+      background-color: #f8fafc;
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 14px;
+      color: #64748b;
+      text-align: center;
+    }
+
+    .chat-image-fallback-text {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .btn-retry-image {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background-color: #ffffff;
+      color: #4f46e5;
+      border: 1px solid #c7d2fe;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 4px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-retry-image:hover {
+      background-color: #eef2ff;
+      border-color: #818cf8;
+      transform: translateY(-1px);
     }
 
     @media (max-width: 480px) {
@@ -986,6 +1271,40 @@
         </span>
       </div>
 
+      <!-- 실시간 채팅 상단 프로필 섹션 -->
+      <div class="chat-profile-section">
+        <div 
+          class="chat-profile-avatar-wrap" 
+          id="profileAvatarBtn" 
+          title="클릭하여 프로필 사진 변경" 
+          role="button" 
+          tabindex="0"
+          aria-label="프로필 사진 변경"
+        >
+          <!-- 동그란 모양의 이미지 태그: 사용자의 프로필 사진 표시 -->
+          <img id="profileAvatarImg" class="chat-avatar-img" src="" alt="프로필 사진" style="display: none;" />
+          <!-- 사진이 없을 때 표시할 기본 사람 아이콘 -->
+          <div id="profileDefaultIcon" class="chat-avatar-default">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <!-- 호버 시 사진 변경 안내 뱃지 -->
+          <div class="chat-avatar-hover-badge" title="사진 변경">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+          </div>
+        </div>
+        <!-- 이미지 아래에 '사진변경'이라는 텍스트 버튼 -->
+        <button type="button" id="btnChangeProfilePhoto" class="btn-change-photo">사진변경</button>
+        <!-- 사용자 PC에서 이미지 파일을 선택할 수 있는 input 태그 -->
+        <input type="file" id="profileFileInput" accept="image/*" style="display: none;" />
+        <div id="profileUploadStatus" class="profile-upload-status" style="display: none;"></div>
+      </div>
+
       <!-- 2. 채팅 메시지들이 표시될 스크롤 가능한 영역 -->
       <div id="chatMessages" class="chat-messages-container" tabindex="0" role="log" aria-live="polite">
         <div class="chat-empty">
@@ -994,7 +1313,7 @@
         </div>
       </div>
 
-      <!-- 3. 하단 메시지 입력 input 창과 '전송' 버튼 -->
+      <!-- 3. 하단 메시지 입력 input 창과 클립/전송 아이콘 버튼 -->
       <form id="chatForm" class="chat-input-form" onsubmit="return false;">
         <input 
           type="text" 
@@ -1004,9 +1323,29 @@
           maxlength="500"
           autocomplete="off"
         />
-        <button id="btnSendChat" class="btn-send-chat" type="submit">
-          <span>전송</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <!-- 클립 모양 이미지 첨부 아이콘 버튼 -->
+        <button 
+          type="button" 
+          id="btnAttachImage" 
+          class="btn-chat-icon btn-attach" 
+          title="이미지 첨부" 
+          aria-label="이미지 파일 첨부"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+          </svg>
+        </button>
+        <!-- 사용자 PC에서 이미지 파일을 선택할 수 있는 input 태그 -->
+        <input type="file" id="chatImageInput" accept="image/*" style="display: none;" />
+        <!-- 아이콘 형태로 변경된 전송 버튼 -->
+        <button 
+          id="btnSendChat" 
+          class="btn-chat-icon btn-send-chat" 
+          type="submit" 
+          title="전송" 
+          aria-label="메시지 전송"
+        >
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"></line>
             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
           </svg>
@@ -1042,7 +1381,17 @@
     const chatForm = document.getElementById('chatForm');
     const chatInput = document.getElementById('chatInput');
     const btnSendChat = document.getElementById('btnSendChat');
+    const btnAttachImage = document.getElementById('btnAttachImage');
+    const chatImageInput = document.getElementById('chatImageInput');
     const chatStatusBadge = document.getElementById('chatStatusBadge');
+
+    // 실시간 채팅 상단 프로필 관련 DOM 요소
+    const profileAvatarBtn = document.getElementById('profileAvatarBtn');
+    const profileAvatarImg = document.getElementById('profileAvatarImg');
+    const profileDefaultIcon = document.getElementById('profileDefaultIcon');
+    const btnChangeProfilePhoto = document.getElementById('btnChangeProfilePhoto');
+    const profileFileInput = document.getElementById('profileFileInput');
+    const profileUploadStatus = document.getElementById('profileUploadStatus');
 
     // 💡 API 베이스 URL (file:/// 로 열었을 경우 자동으로 localhost:3000 연동)
     const API_BASE_URL = window.location.protocol.startsWith('http') ? '' : 'http://localhost:3000';
@@ -1675,6 +2024,198 @@
       }
     }
 
+    // 💡 사용자별 프로필 아바타 URL 캐시 맵 & 비동기 조회 Promise 추적 객체
+    const userAvatarCache = {};
+    const userAvatarFetchPromises = {};
+
+    // 💡 비동기로 Supabase avatars 버킷에서 특정 사용자의 실제 아바타 파일 조회 및 적용
+    async function fetchAndApplyUserAvatar(userId, email) {
+      if (!userId) return;
+
+      // 이미 캐시에 유효한 URL이 있으면 다시 조회하지 않고 UI만 갱신
+      if (userAvatarCache[userId]) {
+        updateChatAvatars(userId, email, userAvatarCache[userId]);
+        return;
+      }
+
+      // 동일 userId에 대한 중복 네트워크 요청 방지
+      if (userAvatarFetchPromises[userId]) return;
+
+      userAvatarFetchPromises[userId] = (async () => {
+        try {
+          if (!supabase || !supabase.storage) return;
+
+          // 1. 해당 유저의 avatars 폴더 내 파일 목록 조회 (최신순)
+          const { data: files, error } = await supabase.storage.from('avatars').list(userId, {
+            limit: 5,
+            sortBy: { column: 'created_at', order: 'desc' }
+          });
+
+          let avatarUrl = null;
+          if (!error && Array.isArray(files) && files.length > 0) {
+            // 실제 이미지 파일 찾기 (avatar.png 또는 avatar_... 등)
+            const targetFile = files.find(f => f.name && !f.name.startsWith('.')) || files[0];
+            if (targetFile) {
+              const { data: pubData } = supabase.storage.from('avatars').getPublicUrl(`${userId}/${targetFile.name}`);
+              if (pubData && pubData.publicUrl) {
+                const cacheBust = targetFile.updated_at ? new Date(targetFile.updated_at).getTime() : Date.now();
+                avatarUrl = `${pubData.publicUrl}?t=${cacheBust}`;
+              }
+            }
+          }
+
+          // 폴더 파일이 바로 조회되지 않을 경우 avatar.png 기본 시도
+          if (!avatarUrl) {
+            const { data: defaultPub } = supabase.storage.from('avatars').getPublicUrl(`${userId}/avatar.png`);
+            if (defaultPub && defaultPub.publicUrl) {
+              avatarUrl = `${defaultPub.publicUrl}?t=${Date.now()}`;
+            }
+          }
+
+          if (avatarUrl) {
+            userAvatarCache[userId] = avatarUrl;
+            if (email) userAvatarCache[email.toLowerCase()] = avatarUrl;
+            localStorage.setItem(`user_avatar_${userId}`, avatarUrl);
+            updateChatAvatars(userId, email, avatarUrl);
+          }
+        } catch (e) {
+          console.warn(`사용자(${userId}) 아바타 조회 예외:`, e);
+        } finally {
+          delete userAvatarFetchPromises[userId];
+        }
+      })();
+    }
+
+    // 특정 사용자의 프로필 아바타 URL 확인
+    function getAvatarUrlForUser(userId, email, isMine) {
+      if (isMine) {
+        // 본인인 경우 현재 화면 상단 아바타 이미지 또는 로컬 스토리지 캐시 우선
+        if (profileAvatarImg && profileAvatarImg.src && profileAvatarImg.style.display !== 'none') {
+          return profileAvatarImg.src;
+        }
+        if (currentChatUser?.user_metadata?.avatar_url) {
+          return currentChatUser.user_metadata.avatar_url;
+        }
+        if (userId && localStorage.getItem(`user_avatar_${userId}`)) {
+          return localStorage.getItem(`user_avatar_${userId}`);
+        }
+      }
+
+      // 1. 메모리 캐시 확인
+      if (userId && userAvatarCache[userId]) return userAvatarCache[userId];
+      if (email && userAvatarCache[email.toLowerCase()]) return userAvatarCache[email.toLowerCase()];
+
+      // 2. localStorage 캐시 확인
+      if (userId) {
+        const cached = localStorage.getItem(`user_avatar_${userId}`);
+        if (cached) {
+          userAvatarCache[userId] = cached;
+          return cached;
+        }
+      }
+
+      // 3. 캐시에 없으면 비동기로 Supabase avatars 버킷에서 실제 아바타 파일 탐색 및 자동 적용
+      if (userId && supabase && supabase.storage) {
+        fetchAndApplyUserAvatar(userId, email);
+      }
+
+      return null;
+    }
+
+    // 채팅 내 특정 사용자의 아바타 이미지들을 즉시 새로운 사진으로 변경
+    function updateChatAvatars(userId, email, newAvatarUrl) {
+      if (!newAvatarUrl) return;
+
+      // 캐시 갱신
+      if (userId) userAvatarCache[userId] = newAvatarUrl;
+      if (email) userAvatarCache[email.toLowerCase()] = newAvatarUrl;
+
+      // 현재 DOM에 렌더링된 모든 메시지 중 해당 사용자의 아바타 엘리먼트 탐색
+      const targetAvatars = [];
+      if (userId) {
+        document.querySelectorAll(`.chat-msg-avatar[data-user-id="${userId}"]`).forEach(el => targetAvatars.push(el));
+      }
+      if (email) {
+        document.querySelectorAll(`.chat-msg-avatar[data-user-email="${email.toLowerCase()}"]`).forEach(el => {
+          if (!targetAvatars.includes(el)) targetAvatars.push(el);
+        });
+      }
+
+      // 본인 메시지의 경우 wrapper.mine 요소의 아바타도 확실하게 갱신
+      const isCurrentUser = currentChatUser && (
+        (userId && currentChatUser.id === userId) || 
+        (email && currentChatUser.email && currentChatUser.email.toLowerCase() === email.toLowerCase())
+      );
+      if (isCurrentUser) {
+        document.querySelectorAll('.chat-bubble-wrapper.mine .chat-msg-avatar').forEach(el => {
+          if (!targetAvatars.includes(el)) targetAvatars.push(el);
+        });
+      }
+
+      targetAvatars.forEach(avatarEl => {
+        let img = avatarEl.querySelector('.chat-msg-avatar-img');
+        const fallback = avatarEl.querySelector('.chat-msg-avatar-fallback');
+        if (!img) {
+          img = document.createElement('img');
+          img.className = 'chat-msg-avatar-img';
+          img.alt = '프로필';
+          img.onerror = function() {
+            this.style.display = 'none';
+            if (fallback) fallback.style.display = 'flex';
+          };
+          avatarEl.insertBefore(img, avatarEl.firstChild);
+        }
+        img.src = newAvatarUrl;
+        img.style.display = 'block';
+        if (fallback) fallback.style.display = 'none';
+      });
+    }
+
+    // 💡 5. 채팅 이미지 로드 실패 시 대체 UI 조치 및 재시도 지원
+    window.handleChatImageError = function(imgEl, originalUrl) {
+      if (!imgEl) return;
+      const container = imgEl.closest('.chat-image-container');
+      if (container) {
+        container.innerHTML = `
+          <div class="chat-image-fallback" title="이미지를 불러올 수 없습니다">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
+              <circle cx="9" cy="9" r="2"></circle>
+              <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"></path>
+              <line x1="3" y1="3" x2="21" y2="21" stroke="#ef4444" stroke-width="2"></line>
+            </svg>
+            <span class="chat-image-fallback-text">이미지를 불러올 수 없습니다</span>
+            <button type="button" class="btn-retry-image" onclick="window.retryChatImage(this, '${escapeHtml(originalUrl)}')">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.19"></path>
+              </svg>
+              다시 시도
+            </button>
+          </div>
+        `;
+      }
+    };
+
+    // 이미지 다시 시도 함수
+    window.retryChatImage = function(btnEl, originalUrl) {
+      const container = btnEl.closest('.chat-image-container');
+      if (!container || !originalUrl) return;
+      const separator = originalUrl.includes('?') ? '&' : '?';
+      const cacheBustedUrl = `${originalUrl}${separator}retry=${Date.now()}`;
+      container.innerHTML = `
+        <img 
+          class="chat-sent-image" 
+          src="${escapeHtml(cacheBustedUrl)}" 
+          alt="채팅 이미지" 
+          loading="lazy"
+          onload="this.classList.add('loaded');"
+          onerror="window.handleChatImageError(this, '${escapeHtml(originalUrl)}');"
+          onclick="window.open('${escapeHtml(originalUrl)}', '_blank');"
+          title="클릭하여 원본 이미지 보기"
+        />
+      `;
+    };
+
     // 개별 채팅 메시지 DOM 엘리먼트 렌더링 및 추가
     function renderChatMessage(msg, autoScroll = true) {
       if (!chatMessages || !msg) return;
@@ -1697,23 +2238,75 @@
         )
       );
 
+      const userId = msg.user_id || msg.senderId || (isMine && currentChatUser ? currentChatUser.id : '');
+
       const wrapper = document.createElement('div');
       wrapper.className = `chat-bubble-wrapper ${isMine ? 'mine' : 'other'}`;
       wrapper.setAttribute('data-msg-id', msg.id);
+      if (userId) wrapper.setAttribute('data-user-id', userId);
+      if (email) wrapper.setAttribute('data-user-email', email.toLowerCase());
 
-      // 4. 각 메시지 옆에 보낸사람의 이메일(user_email 컬럼)을 함께 표시
+      // 각 메시지 옆에 보낸사람의 이메일 및 아바타 표시
       const emailLabel = isMine ? `${email} (나)` : (email || '익명');
       const timeStr = formatChatTime(msg.created_at || msg.timestamp);
 
+      // 사용자별 아바타 이미지 URL 확인
+      const avatarUrl = getAvatarUrlForUser(userId, email, isMine);
+
+      const avatarHtml = `
+        <span class="chat-msg-avatar" data-user-id="${escapeHtml(String(userId || ''))}" data-user-email="${escapeHtml(String(email || '').toLowerCase())}">
+          ${avatarUrl ? `
+            <img class="chat-msg-avatar-img" src="${escapeHtml(avatarUrl)}" alt="${escapeHtml(emailLabel)}" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" />
+            <span class="chat-msg-avatar-fallback" style="display: none;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </span>
+          ` : `
+            <span class="chat-msg-avatar-fallback">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </span>
+          `}
+        </span>
+      `;
+
+      // 💡 4. 메시지 내용이 '![image](...)' 형식인지 판별하여 이미지 렌더링
+      const imageMatch = String(contentText).trim().match(/^!\[(?:image|.*?)\]\((https?:\/\/[^\s)]+|data:image\/[^\s)]+)\)$/i);
+
+      let bubbleContentHtml = '';
+      let bubbleClass = 'chat-bubble';
+
+      if (imageMatch) {
+        const imageUrl = imageMatch[1];
+        bubbleClass += ' has-image';
+        bubbleContentHtml = `
+          <div class="chat-image-container">
+            <img 
+              class="chat-sent-image" 
+              src="${escapeHtml(imageUrl)}" 
+              alt="채팅 이미지" 
+              loading="lazy"
+              onload="this.classList.add('loaded');"
+              onerror="window.handleChatImageError(this, '${escapeHtml(imageUrl)}');"
+              onclick="window.open('${escapeHtml(imageUrl)}', '_blank');"
+              title="클릭하여 원본 이미지 보기"
+            />
+          </div>
+        `;
+      } else {
+        bubbleContentHtml = escapeHtml(contentText);
+      }
+
       wrapper.innerHTML = `
         <div class="chat-sender-info">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-            <rect width="20" height="16" x="2" y="4" rx="2"></rect>
-          </svg>
+          ${avatarHtml}
           <span class="chat-sender-email">${escapeHtml(emailLabel)}</span>
         </div>
-        <div class="chat-bubble">${escapeHtml(contentText)}</div>
+        <div class="${bubbleClass}">${bubbleContentHtml}</div>
         <span class="chat-timestamp">${timeStr}</span>
       `;
 
@@ -1757,6 +2350,11 @@
       chatMessagesList.push(newMsg);
       saveStoredChatMessages(chatMessagesList);
       renderChatMessage(newMsg, true);
+
+      // 보낸 사용자의 아바타가 캐시에 없으면 자동 조회 및 채팅창 반영
+      if (newMsg.user_id) {
+        fetchAndApplyUserAvatar(newMsg.user_id, newMsg.user_email);
+      }
     }
 
     // 3. 페이지가 처음 열릴 때, 기존에 있던 메시지들도 모두 가져와서 화면에 미리 표시
@@ -1787,6 +2385,17 @@
             }));
             saveStoredChatMessages(chatMessagesList);
             renderAllChatMessages();
+
+            // 💡 다른 사용자들의 프로필 사진을 백그라운드에서 일괄 조회하여 즉시 표시
+            const userMap = new Map();
+            chatMessagesList.forEach(m => {
+              if (m.user_id && !userMap.has(m.user_id)) {
+                userMap.set(m.user_id, m.user_email);
+              }
+            });
+            userMap.forEach((uEmail, uId) => {
+              fetchAndApplyUserAvatar(uId, uEmail);
+            });
             return;
           }
         } catch (e) {
@@ -1831,19 +2440,31 @@
           throw new Error('Supabase 클라이언트가 연결되지 않았습니다. 인터넷 연결 및 브라우저 설정을 확인해 주세요.');
         }
 
-        console.log('📤 Supabase message 테이블 insert 요청:', { content: text, user_email: email });
+        const currentUserId = currentChatUser?.id || null;
+        console.log('📤 Supabase message 테이블 insert 요청:', { content: text, user_email: email, user_id: currentUserId });
 
-        // 💡 id 컬럼이 NOT NULL이면서 테이블에 자동 증가(Identity)가 빠진 경우를 대비해 고유 타임스탬프(bigint) 제공
+        // 💡 다른 사용자 화면에서도 프로필 사진을 볼 수 있도록 user_id를 함께 저장
         const messagePayload = {
           id: Date.now(),
           content: text,
-          user_email: email
+          user_email: email,
+          user_id: currentUserId
         };
 
         // 💡 요구사항: supabase.from('message').insert(...)
-        const { data, error } = await supabase
+        let { data, error } = await supabase
           .from('message')
           .insert(messagePayload);
+
+        // 혹시라도 user_id 컬럼 관련 비호환 오류 발생 시 안전 폴백 재시도
+        if (error && currentUserId && error.code !== '42501') {
+          console.warn('⚠️ user_id 포함 insert 실패, 폴백 재시도:', error.message);
+          const fallbackPayload = { id: Date.now(), content: text, user_email: email };
+          const retryRes = await supabase.from('message').insert(fallbackPayload);
+          if (!retryRes.error) {
+            error = null;
+          }
+        }
 
         if (error) {
           console.error('❌ Supabase message insert 에러:', error);
@@ -1897,6 +2518,156 @@
       }
     }
 
+    // ==========================================
+    // 📷 채팅 이미지 첨부 및 전송 함수
+    // ==========================================
+    async function sendChatImage(file) {
+      if (!file) return;
+
+      // 1. 이미지 형식 검사
+      if (!file.type.startsWith('image/')) {
+        alert('이미지 파일(PNG, JPG, JPEG, WEBP, GIF 등)만 첨부할 수 있습니다.');
+        return;
+      }
+
+      // 최대 10MB 크기 제한
+      if (file.size > 10 * 1024 * 1024) {
+        alert('이미지 파일 크기는 10MB 이하여야 합니다.');
+        return;
+      }
+
+      const email = currentChatUser?.email || '';
+      if (!email) {
+        alert('로그인 후 이미지를 전송할 수 있습니다.');
+        return;
+      }
+
+      // 버튼 로딩 상태 전환
+      if (btnAttachImage) {
+        btnAttachImage.disabled = true;
+        btnAttachImage.style.opacity = '0.5';
+      }
+      if (btnSendChat) {
+        btnSendChat.disabled = true;
+        btnSendChat.style.opacity = '0.5';
+      }
+
+      let prevPlaceholder = '';
+      if (chatInput) {
+        prevPlaceholder = chatInput.placeholder;
+        chatInput.placeholder = '이미지 업로드 중... ⏳';
+      }
+
+      try {
+        if (!supabase || !isSupabaseConnected || typeof supabase.from !== 'function') {
+          await initSupabase();
+        }
+
+        if (!supabase || !supabase.storage) {
+          throw new Error('Supabase Storage 클라이언트를 찾을 수 없습니다.');
+        }
+
+        const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const currentUserId = currentChatUser?.id || null;
+        // 💡 고유한 파일 경로 생성 (충돌 방지)
+        const filePath = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}_${cleanName}`;
+
+        console.log(`📤 chat-images 버킷으로 파일 업로드 시작: ${filePath}`);
+
+        // 💡 1. supabase.storage.from('chat-images').upload() 함수 사용
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('chat-images')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) {
+          console.error('❌ chat-images 업로드 오류:', uploadError);
+          if (uploadError.statusCode === '403' || uploadError.error === 'Unauthorized' || (uploadError.message && uploadError.message.includes('row-level security'))) {
+            throw new Error('Supabase "chat-images" 버킷의 INSERT 정책(RLS)을 확인해 주세요. (로그인 필요)');
+          }
+          throw new Error(uploadError.message || '이미지 파일 업로드 실패');
+        }
+
+        console.log('✅ chat-images 업로드 성공:', uploadData);
+
+        // 💡 2. supabase.storage.from('chat-images').getPublicUrl() 함수 사용
+        const { data: urlData } = supabase.storage
+          .from('chat-images')
+          .getPublicUrl(filePath);
+
+        const publicUrl = urlData?.publicUrl;
+        if (!publicUrl) {
+          throw new Error('업로드된 이미지의 공개 URL을 가져오지 못했습니다.');
+        }
+
+        console.log('🔗 이미지 공개 URL:', publicUrl);
+
+        // 💡 3. 'message' 테이블에 새로운 행 추가 (content 컬럼에 '![image](이미지_URL)' 형식으로 저장)
+        const imageMarkdown = `![image](${publicUrl})`;
+        const messagePayload = {
+          id: Date.now(),
+          content: imageMarkdown,
+          user_email: email,
+          user_id: currentUserId
+        };
+
+        let { data: insertData, error: insertError } = await supabase
+          .from('message')
+          .insert(messagePayload);
+
+        // 혹시 모를 messages 테이블 폴백
+        if (insertError && insertError.code === '42P01') {
+          const retryRes = await supabase.from('messages').insert(messagePayload);
+          if (!retryRes.error) insertError = null;
+        }
+
+        if (insertError) {
+          console.error('❌ 메시지 테이블 저장 실패:', insertError);
+          throw new Error(insertError.message || '이미지 메시지 저장 실패');
+        }
+
+        console.log('✅ 이미지 메시지 DB 저장 완료');
+
+        // 로컬 UI 즉시 반영
+        const newMsg = {
+          id: messagePayload.id,
+          user_id: currentUserId,
+          user_email: email,
+          content: imageMarkdown,
+          created_at: new Date().toISOString()
+        };
+
+        handleIncomingChatMessage(newMsg);
+
+        // 브라우저 다른 탭 전파
+        if (chatBroadcastChannel) {
+          try {
+            chatBroadcastChannel.postMessage(newMsg);
+          } catch (bErr) {
+            console.warn('BroadcastChannel 전송 실패:', bErr);
+          }
+        }
+
+      } catch (err) {
+        console.error('이미지 첨부 전송 처리 실패:', err);
+        alert(`이미지 전송 실패: ${err.message}`);
+      } finally {
+        if (btnAttachImage) {
+          btnAttachImage.disabled = false;
+          btnAttachImage.style.opacity = '1';
+        }
+        if (btnSendChat) {
+          btnSendChat.disabled = false;
+          btnSendChat.style.opacity = '1';
+        }
+        if (chatInput && prevPlaceholder) {
+          chatInput.placeholder = prevPlaceholder;
+        }
+      }
+    }
+
     // 다른 탭에서의 localStorage 변경 감지 (폴백 동기화)
     function handleChatStorageEvent(e) {
       if (e.key === CHAT_STORAGE_KEY && e.newValue) {
@@ -1931,7 +2702,11 @@
             chatBroadcastChannel = new BroadcastChannel('emotion_diary_realtime_chat');
             chatBroadcastChannel.onmessage = (event) => {
               if (event && event.data) {
-                handleIncomingChatMessage(event.data);
+                if (event.data.type === 'AVATAR_UPDATE') {
+                  updateChatAvatars(event.data.user_id, event.data.user_email, event.data.avatar_url);
+                } else {
+                  handleIncomingChatMessage(event.data);
+                }
               }
             };
           } catch (e) {
@@ -1980,11 +2755,291 @@
       // 스토리지 변경 이벤트 리스너 등록
       window.removeEventListener('storage', handleChatStorageEvent);
       window.addEventListener('storage', handleChatStorageEvent);
+
+      // 프로필 아바타 로드
+      loadUserProfileAvatar(user);
+    }
+
+    // ==========================================
+    // 👤 실시간 채팅 상단 프로필 사진 기능 모듈
+    // ==========================================
+
+    // 프로필 아바타 UI 업데이트 (사진이 있으면 img 표시, 없으면 기본 사람 아이콘 표시)
+    function updateProfileAvatarUI(imageUrl) {
+      if (!profileAvatarImg || !profileDefaultIcon) return;
+      if (imageUrl && typeof imageUrl === 'string' && imageUrl.trim()) {
+        profileAvatarImg.src = imageUrl;
+        profileAvatarImg.style.display = 'block';
+        profileDefaultIcon.style.display = 'none';
+      } else {
+        profileAvatarImg.src = '';
+        profileAvatarImg.style.display = 'none';
+        profileDefaultIcon.style.display = 'flex';
+      }
+    }
+
+    // 프로필 업로드 상태 안내 표시
+    function setProfileUploadStatus(msg, type = 'info') {
+      if (!profileUploadStatus) return;
+      if (!msg) {
+        profileUploadStatus.textContent = '';
+        profileUploadStatus.style.display = 'none';
+        return;
+      }
+      profileUploadStatus.textContent = msg;
+      profileUploadStatus.className = `profile-upload-status ${type}`;
+      profileUploadStatus.style.display = 'block';
+      if (type === 'success' || type === 'info') {
+        setTimeout(() => {
+          if (profileUploadStatus.textContent === msg) {
+            profileUploadStatus.style.display = 'none';
+          }
+        }, 4000);
+      }
+    }
+
+    // 사용자 프로필 사진 로드
+    async function loadUserProfileAvatar(user) {
+      if (!user) {
+        updateProfileAvatarUI(null);
+        return;
+      }
+
+      // 1. user_metadata에서 avatar_url 또는 picture 확인
+      let avatarUrl = user.user_metadata?.avatar_url || user.user_metadata?.picture || null;
+
+      // 2. localStorage 캐시 확인
+      if (!avatarUrl && user.id) {
+        avatarUrl = localStorage.getItem(`user_avatar_${user.id}`);
+      }
+
+      // 3. Supabase Storage 'avatars' 버킷에서 실제 아바타 파일 탐색
+      if (!avatarUrl && user.id && supabase && supabase.storage) {
+        try {
+          const { data: files, error } = await supabase.storage.from('avatars').list(user.id, {
+            limit: 5,
+            sortBy: { column: 'created_at', order: 'desc' }
+          });
+          if (!error && Array.isArray(files) && files.length > 0) {
+            const targetFile = files.find(f => f.name && !f.name.startsWith('.')) || files[0];
+            if (targetFile) {
+              const { data: pubData } = supabase.storage.from('avatars').getPublicUrl(`${user.id}/${targetFile.name}`);
+              if (pubData && pubData.publicUrl) {
+                avatarUrl = `${pubData.publicUrl}?t=${targetFile.updated_at ? new Date(targetFile.updated_at).getTime() : Date.now()}`;
+                localStorage.setItem(`user_avatar_${user.id}`, avatarUrl);
+              }
+            }
+          }
+        } catch (e) {
+          console.warn('Supabase avatars 조회 실패:', e);
+        }
+      }
+
+      if (avatarUrl) {
+        userAvatarCache[user.id] = avatarUrl;
+        if (user.email) userAvatarCache[user.email.toLowerCase()] = avatarUrl;
+        updateProfileAvatarUI(avatarUrl);
+        updateChatAvatars(user.id, user.email, avatarUrl);
+      } else {
+        updateProfileAvatarUI(null);
+        if (user.id) {
+          fetchAndApplyUserAvatar(user.id, user.email);
+        }
+      }
+    }
+
+    // 프로필 이미지 파일 선택 및 업로드 처리
+    async function handleProfileImageChange(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+
+      // 이미지 파일 형식 검사
+      if (!file.type.startsWith('image/')) {
+        alert('이미지 파일(PNG, JPG, JPEG, WEBP, GIF 등)만 선택할 수 있습니다.');
+        e.target.value = '';
+        return;
+      }
+
+      // 파일 용량 검사 (최대 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('이미지 파일 크기는 5MB 이하여야 합니다.');
+        e.target.value = '';
+        return;
+      }
+
+      // 1. 선택 즉시 로컬 미리보기 반영
+      const objectUrl = URL.createObjectURL(file);
+      updateProfileAvatarUI(objectUrl);
+      setProfileUploadStatus('프로필 사진 업로드 중... ⏳', 'info');
+
+      // 로그인된 사용자 정보 확인 (세션 보강)
+      let user = currentChatUser;
+      if (!user?.id && supabase?.auth?.getUser) {
+        try {
+          const authRes = await supabase.auth.getUser();
+          if (authRes.data?.user) {
+            user = authRes.data.user;
+            currentChatUser = user;
+          }
+        } catch (err) {}
+      }
+
+      const userId = user?.id;
+      const userEmail = user?.email;
+
+      if (!userId) {
+        // 비로그인/데모 모드일 때 로컬 Base64 보존
+        const reader = new FileReader();
+        reader.onload = (readEvent) => {
+          const base64Data = readEvent.target.result;
+          localStorage.setItem('user_avatar_default', base64Data);
+          updateProfileAvatarUI(base64Data);
+          updateChatAvatars('demo', userEmail || 'user', base64Data);
+          setProfileUploadStatus('프로필 사진이 로컬에 저장되었습니다. ✨', 'success');
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+        return;
+      }
+
+      try {
+        if (!supabase || !supabase.storage) {
+          throw new Error('Supabase 클라이언트를 찾을 수 없습니다.');
+        }
+
+        // 💡 1. 파일 경로는 사용자의 ID를 사용해서 고유하게 만듦: [user_id]/avatar.png
+        const filePath = `${userId}/avatar.png`;
+        console.log(`📤 Supabase 'avatars' 버킷 업로드 시작: ${filePath}`);
+
+        // 💡 1. supabase.storage.from('avatars').upload() 함수 사용
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, file, {
+            cacheControl: '0',
+            upsert: true
+          });
+
+        if (uploadError) {
+          console.error('❌ Supabase storage upload 에러:', uploadError);
+          throw uploadError;
+        }
+
+        console.log('✅ Supabase storage upload 성공:', uploadData);
+
+        // 💡 2. 업로드가 성공하면, 방금 업로드한 파일의 공개URL을 가져옴
+        // supabase.storage.from('avatars').getPublicUrl() 함수 사용
+        const { data: urlData } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(filePath);
+
+        const publicUrl = urlData?.publicUrl;
+        if (!publicUrl) {
+          throw new Error('공개 URL을 가져오지 못했습니다.');
+        }
+
+        // 브라우저 캐시 무효화를 위해 타임스탬프 쿼리 추가
+        const displayUrl = `${publicUrl}?t=${Date.now()}`;
+        console.log('🔗 프로필 사진 공개 URL:', displayUrl);
+
+        // 💡 3. 가져온 URL을 Supbase Auth의 사용자 메타데이터에 저장
+        // supabase.auth.updateUser({ data: { avatar_url: URL } }) 함수 사용
+        if (supabase.auth && typeof supabase.auth.updateUser === 'function') {
+          try {
+            const { data: authUpdateData, error: authUpdateError } = await supabase.auth.updateUser({
+              data: { avatar_url: publicUrl }
+            });
+            if (authUpdateError) {
+              console.warn('⚠️ Supabase Auth 메타데이터 업데이트 경고:', authUpdateError.message);
+            } else {
+              console.log('✅ Supabase Auth 메타데이터 저장 완료:', authUpdateData);
+            }
+          } catch (authErr) {
+            console.warn('⚠️ Supabase Auth updateUser 예외:', authErr);
+          }
+        }
+
+        // 💡 4. 프로필 사진이 업데이트 되면, 화면 상단의 프로필 이미지도 즉시 새로운 사진으로 변경
+        updateProfileAvatarUI(displayUrl);
+        if (currentChatUser) {
+          if (!currentChatUser.user_metadata) currentChatUser.user_metadata = {};
+          currentChatUser.user_metadata.avatar_url = publicUrl;
+        }
+        userAvatarCache[userId] = displayUrl;
+        if (userEmail) userAvatarCache[userEmail.toLowerCase()] = displayUrl;
+        localStorage.setItem(`user_avatar_${userId}`, displayUrl);
+
+        // 💡 5. 채팅에서 사용자별 이미지도 업데이트되면 즉시 새로운 사진이 나타나게 연결
+        updateChatAvatars(userId, userEmail, displayUrl);
+
+        // 브라우저 다른 탭들에도 실시간 전파 (BroadcastChannel)
+        if (chatBroadcastChannel) {
+          try {
+            chatBroadcastChannel.postMessage({
+              type: 'AVATAR_UPDATE',
+              user_id: userId,
+              user_email: userEmail,
+              avatar_url: displayUrl
+            });
+          } catch (bErr) {
+            console.warn('BroadcastChannel 전송 실패:', bErr);
+          }
+        }
+
+        setProfileUploadStatus('프로필 사진이 성공적으로 변경되었습니다! ✨', 'success');
+
+      } catch (err) {
+        console.error('❌ 프로필 사진 업로드 처리 실패:', err);
+
+        // 로컬 Base64 폴백 저장
+        const reader = new FileReader();
+        reader.onload = (readEvent) => {
+          const base64Data = readEvent.target.result;
+          if (userId) {
+            localStorage.setItem(`user_avatar_${userId}`, base64Data);
+          }
+          updateProfileAvatarUI(base64Data);
+          updateChatAvatars(userId, userEmail, base64Data);
+        };
+        reader.readAsDataURL(file);
+
+        let errorMsg = err.message || '사진 저장 중 오류가 발생했습니다.';
+        if (err.statusCode === '403' || err.code === '42501' || (err.message && err.message.includes('row-level security'))) {
+          errorMsg = 'Supabase avatars 버킷 보안 정책(RLS)을 확인해 주세요.';
+        }
+        setProfileUploadStatus(`오류: ${errorMsg}`, 'error');
+        alert(`프로필 사진 업로드 실패: ${errorMsg}`);
+      } finally {
+        e.target.value = '';
+      }
+    }
+
+    // 프로필 사진 변경 이벤트 연결 (동그란 이미지 또는 '사진변경' 버튼 클릭 시 파일 선택창 열기)
+    if (profileAvatarBtn && profileFileInput) {
+      profileAvatarBtn.addEventListener('click', () => {
+        profileFileInput.click();
+      });
+      profileAvatarBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          profileFileInput.click();
+        }
+      });
+    }
+
+    if (btnChangeProfilePhoto && profileFileInput) {
+      btnChangeProfilePhoto.addEventListener('click', () => {
+        profileFileInput.click();
+      });
+    }
+
+    if (profileFileInput) {
+      profileFileInput.addEventListener('change', handleProfileImageChange);
     }
 
     // 채팅 종료 및 정리 (로그아웃 시 호출)
     function leaveRealtimeChat() {
       currentChatUser = null;
+      updateProfileAvatarUI(null);
       if (supabaseChatChannel && supabase && typeof supabase.removeChannel === 'function') {
         try {
           supabase.removeChannel(supabaseChatChannel);
@@ -1999,6 +3054,26 @@
       chatForm.addEventListener('submit', (e) => {
         e.preventDefault();
         sendChatMessage();
+      });
+    }
+
+    // 클립 모양 이미지 첨부 버튼 이벤트 연결 (파일 선택창 열기)
+    if (btnAttachImage && chatImageInput) {
+      btnAttachImage.addEventListener('click', () => {
+        chatImageInput.click();
+      });
+    }
+
+    // 이미지 파일 선택 시 이벤트 처리 (chat-images 버킷 업로드 및 메시지 전송)
+    if (chatImageInput) {
+      chatImageInput.addEventListener('change', async (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+
+        // 동일한 파일 재선택을 위해 value 초기화
+        e.target.value = '';
+
+        await sendChatImage(file);
       });
     }
 
