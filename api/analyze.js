@@ -45,21 +45,33 @@ function getEnvValue(key) {
   return null;
 }
 
+// Redis 연결 URL 조회
+function getRedisUrl() {
+  return (
+    getEnvValue('REDIS_URL') ||
+    getEnvValue('KV_URL') ||
+    getEnvValue('UPSTASH_REDIS_URL') ||
+    getEnvValue('REDIS_CONNECTION_STRING')
+  );
+}
+
 // Redis 클라이언트 싱글톤 인스턴스 (서버리스 웜 컨테이너에서 커넥션 재사용)
 let redisClient = null;
 
 function getRedisClient() {
-  const redisUrl = getEnvValue('REDIS_URL');
+  const redisUrl = getRedisUrl();
   if (!redisUrl) {
     return null;
   }
 
   if (!redisClient) {
+    const isTls = redisUrl.startsWith('rediss://');
     redisClient = new Redis(redisUrl, {
       maxRetriesPerRequest: 3,
-      connectTimeout: 5000,
+      connectTimeout: 8000,
       lazyConnect: true,
       enableReadyCheck: false,
+      ...(isTls ? { tls: { rejectUnauthorized: false } } : {}),
       retryStrategy(times) {
         if (times > 3) return null;
         return Math.min(times * 100, 2000);

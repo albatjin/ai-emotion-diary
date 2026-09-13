@@ -45,21 +45,33 @@ function getEnvValue(key) {
   return null;
 }
 
+// Redis 연결 URL 조회
+function getRedisUrl() {
+  return (
+    getEnvValue('REDIS_URL') ||
+    getEnvValue('KV_URL') ||
+    getEnvValue('UPSTASH_REDIS_URL') ||
+    getEnvValue('REDIS_CONNECTION_STRING')
+  );
+}
+
 // Redis 클라이언트 싱글톤 인스턴스 (서버리스 웜 컨테이너 커넥션 재사용)
 let redisClient = null;
 
 function getRedisClient() {
-  const redisUrl = getEnvValue('REDIS_URL');
+  const redisUrl = getRedisUrl();
   if (!redisUrl) {
     return null;
   }
 
   if (!redisClient) {
+    const isTls = redisUrl.startsWith('rediss://');
     redisClient = new Redis(redisUrl, {
       maxRetriesPerRequest: 3,
-      connectTimeout: 5000,
+      connectTimeout: 8000,
       lazyConnect: true,
       enableReadyCheck: false,
+      ...(isTls ? { tls: { rejectUnauthorized: false } } : {}),
       retryStrategy(times) {
         if (times > 3) return null;
         return Math.min(times * 100, 2000);
@@ -143,11 +155,18 @@ module.exports = async function handler(req, res) {
       await client.connect();
     }
 
-    // 5. Redis에서 현재 로그인 사용자의 일기 키('user:[사용자ID]:diary-*') 조회
+    // 5. Redis에서 현재 로그인 사용자의 일기 키 조회
+    // 1) 신규 네임스페이스 키: user:[사용자ID]:diary-*
     const userPattern = `user:${userId}:diary-*`;
-    const keys = await client.keys(userPattern);
+    const userKeys = (await client.keys(userPattern)) || [];
 
-    if (!keys || keys.length === 0) {
+    // 2) 레거시 키: diary-* (기존 일기 중 본인 데이터 호환 복원)
+    const legacyKeys = (await client.keys('diary-*')) || [];
+    const allCandidateKeys = [...new Set([...userKeys, ...legacyKeys])];
+
+    console.log(`[History Debug] Redis keys found: userKeys=${userKeys.length}, legacyKeys=${legacyKeys.length}`);
+
+    if (!allCandidateKeys || allCandidateKeys.length === 0) {
       return res.status(200).json({
         success: true,
         count: 0,
@@ -155,30 +174,24 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // 5. MGET으로 모든 일기 데이터 한 번에 병렬 조회
-    const rawDataList = await client.mget(keys);
+    // 6. MGET으로 모든 후보 일기 데이터 한 번에 병렬 조회
+    const rawDataList = await client.mget(allCandidateKeys);
 
-    const diaries = [];
+    const userDiaries = [];
     for (let i = 0; i < rawDataList.length; i++) {
       const raw = rawDataList[i];
       if (raw) {
         try {
           const parsed = JSON.parse(raw);
-          diaries.push(parsed);
+          // 💡 핵심: 오직 현재 로그인한 사용자 본인의 일기만 엄격하게 수집!
+          if (parsed && parsed.userId === userId) {
+            userDiaries.push(parsed);
+          }
         } catch {
-          // JSON 파싱 에러 시 기본 구조로 폴백
-          diaries.push({
-            id: keys[i],
-            diaryText: raw,
-            aiReply: '',
-            createdAt: ''
-          });
+          // JSON 파싱 에러 무시
         }
       }
     }
-
-    // 6. 현재 사용자 ID 일치 2차 검증 필터링
-    const userDiaries = diaries.filter(item => item && item.userId === userId);
 
     // 7. 최신순 정렬 (ID 또는 createdAt 기준 내림차순)
     userDiaries.sort((a, b) => {
